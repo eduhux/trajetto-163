@@ -34,6 +34,11 @@ function paraMillis(v: unknown): number {
 /**
  * Abre (ou cria, se nao existir) a conversa entre o usuario atual e o dono do
  * frete. Retorna o id da conversa.
+ *
+ * Usa setDoc com merge para ser idempotente e nao depender de uma leitura
+ * previa (ler um documento inexistente e bloqueado pelas regras de seguranca).
+ * Os campos voláteis (naoLidas, ultimaMensagem) nao sao tocados aqui — sao
+ * criados/atualizados quando a primeira mensagem e enviada.
  */
 export async function iniciarConversa(
   frete: FreteDoc,
@@ -41,17 +46,13 @@ export async function iniciarConversa(
 ): Promise<string> {
   const outroUid = frete.clienteUid;
   const id = idConversa(frete.id, meuPerfil.uid, outroUid);
-  const ref = doc(db, COLLECTIONS.conversas, id);
-  const snap = await getDoc(ref);
+  const participantes = [meuPerfil.uid, outroUid].sort() as [string, string];
 
-  if (!snap.exists()) {
-    const participantes = [meuPerfil.uid, outroUid].sort() as [string, string];
-    await setDoc(ref, {
+  await setDoc(
+    doc(db, COLLECTIONS.conversas, id),
+    {
       freteId: frete.id,
       participantes,
-      ultimaMensagem: "",
-      ultimaMensagemEm: serverTimestamp(),
-      naoLidas: { [meuPerfil.uid]: 0, [outroUid]: 0 },
       metaParticipantes: {
         [meuPerfil.uid]: {
           nome: meuPerfil.nomeCompleto,
@@ -62,10 +63,10 @@ export async function iniciarConversa(
           fotoUrl: frete.clienteFotoUrl ?? null,
         },
       },
-      criadoEm: serverTimestamp(),
       atualizadoEm: serverTimestamp(),
-    });
-  }
+    },
+    { merge: true },
+  );
   return id;
 }
 

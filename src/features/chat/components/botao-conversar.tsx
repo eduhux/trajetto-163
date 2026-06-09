@@ -22,7 +22,8 @@ export function BotaoConversar({ frete }: { frete: FreteDoc }) {
     try {
       const id = await iniciarConversa(frete, perfil);
       router.push(`/mensagens/${id}`);
-    } catch {
+    } catch (e) {
+      console.error("Falha ao abrir conversa:", e);
       setCarregando(false);
     }
   }
