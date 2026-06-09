@@ -1,5 +1,8 @@
 import { z } from "zod";
 import { estadoUFSchema } from "./common";
+import { contemContato } from "@/lib/moderacao/contato";
+
+const SEM_CONTATO = "Não inclua telefone ou WhatsApp aqui. A negociação acontece pelo chat.";
 
 export const publicarFreteSchema = z.object({
   estadoOrigem: estadoUFSchema,
@@ -9,13 +12,19 @@ export const publicarFreteSchema = z.object({
   descricaoCarga: z
     .string()
     .min(5, "Descreva a carga.")
-    .max(500, "Descricao muito longa."),
+    .max(500, "Descricao muito longa.")
+    .refine((v) => !contemContato(v), SEM_CONTATO),
   pesoKg: z.coerce.number().positive("Peso deve ser maior que zero."),
   volumeM3: z.coerce.number().positive().optional().nullable(),
   valorFrete: z.coerce.number().positive("Valor deve ser maior que zero."),
   // ISO date string vinda do input; convertida para Timestamp no service.
   dataColeta: z.string().min(1, "Informe a data de coleta."),
-  observacoes: z.string().max(500).optional().nullable(),
+  observacoes: z
+    .string()
+    .max(500)
+    .refine((v) => !contemContato(v), SEM_CONTATO)
+    .optional()
+    .nullable(),
   urgencia: z.enum(["normal", "urgente", "imediato"]).default("normal"),
 });
 export type PublicarFreteInput = z.infer<typeof publicarFreteSchema>;

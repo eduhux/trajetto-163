@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { MensagemBolha } from "@/features/chat/components/mensagem-bolha";
+import { AVISO_CONTATO, contemContato } from "@/lib/moderacao/contato";
 import {
   buscarConversa,
   enviarMensagem,
@@ -27,6 +28,7 @@ export default function ConversaPage() {
   const [mensagens, setMensagens] = useState<MensagemDoc[]>([]);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
   const fimRef = useRef<HTMLDivElement>(null);
 
   // Carrega a conversa, valida participante e zera nao lidas.
@@ -73,6 +75,11 @@ export default function ConversaPage() {
   async function enviar() {
     const limpo = texto.trim();
     if (!limpo || enviando) return;
+    if (contemContato(limpo)) {
+      setAviso(AVISO_CONTATO);
+      return;
+    }
+    setAviso(null);
     setEnviando(true);
     setTexto("");
     try {
@@ -115,27 +122,37 @@ export default function ConversaPage() {
       </div>
 
       <div className="border-t border-border bg-carbon-950">
-        <div className="container flex max-w-2xl items-center gap-2 py-3">
-          <Input
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                enviar();
-              }
-            }}
-            placeholder="Escreva uma mensagem..."
-            autoComplete="off"
-          />
-          <Button
-            size="icon"
-            onClick={enviar}
-            disabled={enviando || !texto.trim()}
-            aria-label="Enviar"
-          >
-            {enviando ? <Loader2 className="animate-spin" /> : <SendHorizonal className="size-4" />}
-          </Button>
+        <div className="container max-w-2xl py-3">
+          {aviso && (
+            <p className="mb-2 rounded-lg border border-trajetto/30 bg-trajetto/10 px-3 py-2 text-xs text-trajetto">
+              {aviso}
+            </p>
+          )}
+          <div className="flex items-center gap-2">
+            <Input
+              value={texto}
+              onChange={(e) => {
+                setTexto(e.target.value);
+                if (aviso) setAviso(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  enviar();
+                }
+              }}
+              placeholder="Escreva uma mensagem..."
+              autoComplete="off"
+            />
+            <Button
+              size="icon"
+              onClick={enviar}
+              disabled={enviando || !texto.trim()}
+              aria-label="Enviar"
+            >
+              {enviando ? <Loader2 className="animate-spin" /> : <SendHorizonal className="size-4" />}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
