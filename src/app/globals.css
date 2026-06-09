@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Tema claro (paginas publicas / formularios) */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 140 10% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 140 10% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 10% 8%;
+
+    /* primary = lime da marca */
+    --primary: 84 100% 50%;
+    --primary-foreground: 140 30% 8%;
+
+    --secondary: 140 5% 96%;
+    --secondary-foreground: 140 10% 12%;
+
+    --muted: 140 5% 96%;
+    --muted-foreground: 140 5% 40%;
+
+    --accent: 84 100% 50%;
+    --accent-foreground: 140 30% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 140 6% 90%;
+    --input: 140 6% 90%;
+    --ring: 84 100% 50%;
+
+    --radius: 0.75rem;
+  }
+
+  /* Tema escuro (institucional / app) */
+  .dark {
+    --background: 140 12% 4%;
+    --foreground: 140 6% 96%;
+
+    --card: 140 10% 7%;
+    --card-foreground: 140 6% 96%;
+
+    --popover: 140 10% 7%;
+    --popover-foreground: 140 6% 96%;
+
+    --primary: 84 100% 50%;
+    --primary-foreground: 140 30% 8%;
+
+    --secondary: 140 8% 14%;
+    --secondary-foreground: 140 6% 96%;
+
+    --muted: 140 8% 14%;
+    --muted-foreground: 140 5% 60%;
+
+    --accent: 84 100% 50%;
+    --accent-foreground: 140 30% 8%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 140 8% 16%;
+    --input: 140 8% 16%;
+    --ring: 84 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism discreto para elementos estrategicos (header, modais premium) */
+  .glass {
+    background: rgba(17, 20, 15, 0.55);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(158, 255, 0, 0.08);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}

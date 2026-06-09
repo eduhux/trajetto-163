@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() { return request.auth != null; }
+    function isSelf(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function imagemValida() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Foto de perfil: dono escreve, leitura publica.
+    match /perfis/{uid}/{arquivo} {
+      allow read: if true;
+      allow write: if isSelf(uid) && imagemValida();
+    }
+
+    // Foto da CNH: dono escreve e le; NAO publica.
+    match /cnh/{uid}/{arquivo} {
+      allow read: if isSelf(uid);
+      allow write: if isSelf(uid) && imagemValida();
+    }
+
+    // Banners: leitura publica; escrita restrita (feita via Admin SDK no backend).
+    match /banners/{arquivo} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

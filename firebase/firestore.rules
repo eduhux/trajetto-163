@@ -1,0 +1,186 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Admin verificado via custom claim setada pelo backend (Admin SDK).
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function naoEstaSuspenso() {
+      // Le o doc do proprio usuario; .get com default mantem compat com docs antigos.
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+          .get('suspenso', false) == false;
+    }
+
+    function existeCampo(campos) {
+      return request.resource.data.keys().hasAll(campos);
+    }
+
+    // ---------------------------------------------------------------
+    // users
+    // ---------------------------------------------------------------
+    match /users/{uid} {
+      // Perfis sao publicos para leitura (necessario p/ exibir autor de frete,
+      // participantes de chat etc.). Dados sensiveis nao ficam aqui.
+      allow read: if true;
+
+      // Cria apenas o proprio documento, com plano forcado a gratuito e sem admin.
+      allow create: if isSelf(uid)
+        && existeCampo(['uid', 'tipoConta', 'nomeCompleto', 'documento',
+                        'telefone', 'cidade', 'estado', 'email'])
+        && request.resource.data.uid == uid
+        && request.resource.data.plano == 'gratuito'
+        && request.resource.data.get('admin', false) == false
+        && request.resource.data.get('suspenso', false) == false;
+
+      // Usuario atualiza o proprio perfil, mas NUNCA plano/admin/suspenso/metricas.
+      allow update: if isSelf(uid)
+        && request.resource.data.plano == resource.data.plano
+        && request.resource.data.admin == resource.data.admin
+        && request.resource.data.suspenso == resource.data.suspenso
+        && request.resource.data.totalFretesPublicados == resource.data.totalFretesPublicados;
+
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // motoristas
+    // ---------------------------------------------------------------
+    match /motoristas/{uid} {
+      allow read: if true;
+
+      allow create: if isSelf(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.get('avaliacaoMedia', 0) == 0
+        && request.resource.data.get('totalAvaliacoes', 0) == 0;
+
+      // Reputacao (avaliacaoMedia/totalAvaliacoes/totalFretesRealizados) e
+      // mantida pelo backend; o motorista nao pode alterar.
+      allow update: if isSelf(uid)
+        && request.resource.data.avaliacaoMedia == resource.data.avaliacaoMedia
+        && request.resource.data.totalAvaliacoes == resource.data.totalAvaliacoes
+        && request.resource.data.totalFretesRealizados == resource.data.totalFretesRealizados;
+
+      allow write: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // fretes
+    // ---------------------------------------------------------------
+    match /fretes/{freteId} {
+      // Anuncios sao publicos.
+      allow read: if true;
+
+      allow create: if naoEstaSuspenso()
+        && request.resource.data.clienteUid == request.auth.uid
+        && request.resource.data.status == 'ativo'
+        && request.resource.data.get('visualizacoes', 0) == 0
+        && request.resource.data.get('contatosRecebidos', 0) == 0;
+
+      // Dono edita o proprio frete, mas nao pode forjar destaque (premium/backend),
+      // nem metricas.
+      allow update: if isSignedIn()
+        && resource.data.clienteUid == request.auth.uid
+        && request.resource.data.clienteUid == resource.data.clienteUid
+        && request.resource.data.destaque == resource.data.destaque
+        && request.resource.data.visualizacoes == resource.data.visualizacoes
+        && request.resource.data.contatosRecebidos == resource.data.contatosRecebidos;
+
+      allow delete: if isSignedIn()
+        && resource.data.clienteUid == request.auth.uid;
+
+      allow write: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // assinaturas (somente backend escreve; usuario le as proprias)
+    // ---------------------------------------------------------------
+    match /assinaturas/{id} {
+      allow read: if isSelf(resource.data.uid) || isAdmin();
+      allow write: if isAdmin(); // Admin SDK bypassa rules; cliente nunca escreve.
+    }
+
+    // ---------------------------------------------------------------
+    // conversas + mensagens
+    // ---------------------------------------------------------------
+    match /conversas/{conversaId} {
+      function ehParticipante() {
+        return isSignedIn() &&
+          request.auth.uid in resource.data.participantes;
+      }
+      function ehParticipanteNova() {
+        return isSignedIn() &&
+          request.auth.uid in request.resource.data.participantes;
+      }
+
+      allow read: if ehParticipante() || isAdmin();
+      allow create: if ehParticipanteNova() && naoEstaSuspenso();
+      allow update: if ehParticipante();
+      allow delete: if isAdmin();
+
+      match /mensagens/{mensagemId} {
+        function ehParticipanteConversa() {
+          return isSignedIn() && request.auth.uid in
+            get(/databases/$(database)/documents/conversas/$(conversaId))
+              .data.participantes;
+        }
+        allow read: if ehParticipanteConversa() || isAdmin();
+        allow create: if ehParticipanteConversa()
+          && request.resource.data.autorUid == request.auth.uid;
+        allow update: if ehParticipanteConversa(); // marcar como lida
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ---------------------------------------------------------------
+    // avaliacoes (cliente cria; backend recalcula media)
+    // ---------------------------------------------------------------
+    match /avaliacoes/{id} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.clienteUid == request.auth.uid
+        && request.resource.data.nota >= 1
+        && request.resource.data.nota <= 5;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // notificacoes (usuario le/marca as proprias; backend cria)
+    // ---------------------------------------------------------------
+    match /notificacoes/{id} {
+      allow read: if isSelf(resource.data.destinatarioUid) || isAdmin();
+      allow update: if isSelf(resource.data.destinatarioUid); // marcar lida
+      allow create, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // banners (leitura publica; escrita admin)
+    // ---------------------------------------------------------------
+    match /banners/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // configuracoes (leitura publica; escrita admin)
+    // ---------------------------------------------------------------
+    match /configuracoes/{chave} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
