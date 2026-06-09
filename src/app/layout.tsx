@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,8 +17,8 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Trajetto 163 — Fretes entre SP e MS",
-    template: "%s | Trajetto 163",
+    default: "Trajjeto 163 — Fretes entre SP e MS",
+    template: "%s | Trajjeto 163",
   },
   description:
     "Conectando fretes entre São Paulo e Mato Grosso do Sul. O marketplace especializado no corredor logístico MS ⇄ SP.",
@@ -36,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} ${mono.variable} font-sans`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

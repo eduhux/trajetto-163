@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -16,6 +17,8 @@ const LINKS = [
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [aberto, setAberto] = useState(false);
+  const { autenticado, cadastroCompleto } = useAuth();
+  const logado = autenticado && cadastroCompleto;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -47,12 +50,20 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/entrar">Entrar</Link>
-          </Button>
-          <Button asChild variant="primary" size="sm">
-            <Link href="/cadastro">Criar conta</Link>
-          </Button>
+          {logado ? (
+            <Button asChild variant="primary" size="sm">
+              <Link href="/painel">Meu painel</Link>
+            </Button>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/entrar">Entrar</Link>
+              </Button>
+              <Button asChild variant="primary" size="sm">
+                <Link href="/cadastro">Criar conta</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <button
@@ -79,12 +90,20 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-2 flex flex-col gap-2 px-1">
-              <Button asChild variant="outline" size="md">
-                <Link href="/entrar">Entrar</Link>
-              </Button>
-              <Button asChild variant="primary" size="md">
-                <Link href="/cadastro">Criar conta</Link>
-              </Button>
+              {logado ? (
+                <Button asChild variant="primary" size="md">
+                  <Link href="/painel">Meu painel</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="outline" size="md">
+                    <Link href="/entrar">Entrar</Link>
+                  </Button>
+                  <Button asChild variant="primary" size="md">
+                    <Link href="/cadastro">Criar conta</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

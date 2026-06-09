@@ -53,6 +53,27 @@ const tipoVeiculoSchema = z.enum([
   "carreta",
 ]);
 
+/** Campos base para completar perfil (fluxo Google, sem e-mail/senha). */
+export const completarBaseSchema = z.object({
+  documento: cpfOuCnpjSchema,
+  telefone: telefoneSchema,
+  cidade: z.string().min(2, "Informe a cidade."),
+  estado: estadoUFSchema,
+});
+export type CompletarBaseInput = z.infer<typeof completarBaseSchema>;
+
+/** Campos profissionais do motorista para completar perfil (fluxo Google). */
+export const completarMotoristaSchema = completarBaseSchema.extend({
+  cnhNumero: z.string().min(9, "Número de CNH inválido.").max(11),
+  cnhCategoria: cnhCategoriaSchema,
+  tipoVeiculo: tipoVeiculoSchema,
+  placa: placaSchema,
+  capacidadeCargaKg: z.coerce
+    .number({ invalid_type_error: "Informe a capacidade." })
+    .positive("Capacidade deve ser maior que zero."),
+});
+export type CompletarMotoristaInput = z.infer<typeof completarMotoristaSchema>;
+
 /** Cadastro de MOTORISTA (dados base + profissionais). */
 export const cadastroMotoristaSchema = z
   .object({
