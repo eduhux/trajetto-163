@@ -2,10 +2,11 @@
 
 import {
   createUserWithEmailAndPassword,
+  getRedirectResult,
   GoogleAuthProvider,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   signOut,
   updateProfile,
   type User as FirebaseUser,
@@ -136,16 +137,21 @@ export async function entrarComEmail(email: string, senha: string) {
 }
 
 /**
- * Login com Google. Retorna o usuario e se ja existe perfil no Firestore.
- * Quando nao existe, o app deve mandar o usuario completar o cadastro.
+ * Inicia o login com Google por REDIRECIONAMENTO.
+ * A pagina sai para o Google e volta sozinha — funciona em qualquer
+ * navegador e no celular, sem depender de popup.
  */
-export async function entrarComGoogle(): Promise<{
-  user: FirebaseUser;
-  perfilExiste: boolean;
-}> {
-  const cred = await signInWithPopup(auth, googleProvider);
-  const snap = await getDoc(doc(db, COLLECTIONS.users, cred.user.uid));
-  return { user: cred.user, perfilExiste: snap.exists() };
+export async function iniciarLoginGoogle() {
+  await signInWithRedirect(auth, googleProvider);
+}
+
+/**
+ * Conclui o login apos o retorno do Google. Deve ser chamado ao carregar o app.
+ * Retorna o usuario quando houve um login por redirecionamento, ou null.
+ */
+export async function processarRedirectGoogle(): Promise<FirebaseUser | null> {
+  const res = await getRedirectResult(auth);
+  return res?.user ?? null;
 }
 
 /** Completa o perfil de um usuario ja autenticado (fluxo Google). */

@@ -4,7 +4,11 @@ import { useEffect, type ReactNode } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { useAuthStore } from "@/stores";
-import { buscarMotorista, buscarPerfil } from "@/features/auth/services/auth-service";
+import {
+  buscarMotorista,
+  buscarPerfil,
+  processarRedirectGoogle,
+} from "@/features/auth/services/auth-service";
 
 /**
  * Observa o estado de autenticacao do Firebase durante toda a vida do app.
@@ -16,6 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useAuthStore();
 
   useEffect(() => {
+    // Conclui um eventual login Google por redirecionamento (silencioso se nao houver).
+    processarRedirectGoogle().catch(() => {});
+
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         reset();

@@ -1,21 +1,26 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/shared/logo";
 import { TelaCarregando } from "@/components/shared/loading";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
-/** Layout das telas de auth. Usuario ja logado e completo vai direto pro painel. */
+/** Layout das telas de auth. Roteia conforme o estado de login. */
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { carregando, autenticado, cadastroCompleto } = useAuth();
 
   useEffect(() => {
-    if (!carregando && autenticado && cadastroCompleto) {
+    if (carregando) return;
+    if (autenticado && cadastroCompleto) {
       router.replace("/painel");
+    } else if (autenticado && !cadastroCompleto && pathname !== "/completar-cadastro") {
+      // Veio do Google sem perfil: completar cadastro.
+      router.replace("/completar-cadastro");
     }
-  }, [carregando, autenticado, cadastroCompleto, router]);
+  }, [carregando, autenticado, cadastroCompleto, pathname, router]);
 
   if (carregando) return <TelaCarregando />;
 

@@ -3,6 +3,8 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { TelaCarregando } from "@/components/shared/loading";
+import { AppHeader } from "@/components/shared/app-header";
+import { UpgradeModal } from "@/features/fretes/components/upgrade-modal";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
 /** Protege as rotas internas: exige login e cadastro completo. */
@@ -23,5 +25,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     return <TelaCarregando />;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen bg-carbon-950">
+      <AppHeader />
+      {children}
+      <UpgradeModal />
+    </div>
+  );
 }
