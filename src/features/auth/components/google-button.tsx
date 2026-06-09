@@ -1,23 +1,27 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  iniciarLoginGoogle,
+  entrarComGoogle,
   mensagemErroAuth,
 } from "@/features/auth/services/auth-service";
 
 export function GoogleButton({ onErro }: { onErro?: (msg: string) => void }) {
+  const router = useRouter();
   const [carregando, setCarregando] = useState(false);
 
   async function clicar() {
     setCarregando(true);
     try {
-      // A pagina sera redirecionada para o Google e voltara sozinha.
-      await iniciarLoginGoogle();
+      const { perfilExiste } = await entrarComGoogle();
+      router.push(perfilExiste ? "/painel" : "/completar-cadastro");
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code ?? "";
+      // Ajuda a diagnosticar caso algo falhe no futuro.
+      console.error("Falha no login Google:", code, e);
       onErro?.(mensagemErroAuth(code));
       setCarregando(false);
     }
