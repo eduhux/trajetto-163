@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PackageSearch } from "lucide-react";
 import { TelaCarregando } from "@/components/shared/loading";
 import { FreteCard } from "@/features/fretes/components/frete-card";
+import { BotaoConversar } from "@/features/chat/components/botao-conversar";
 import { listarFretesAtivos } from "@/features/fretes/services/frete-service";
 import type { FreteDoc } from "@/types";
 
@@ -33,7 +34,7 @@ export default function FretesPage() {
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {fretes.map((f) => (
-            <FreteCard key={f.id} frete={f} />
+            <FreteCard key={f.id} frete={f} acao={<BotaoConversar frete={f} />} />
           ))}
         </div>
       )}

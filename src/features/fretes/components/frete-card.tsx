@@ -1,4 +1,5 @@
 import { ArrowRight, Calendar, Package, Star, Weight } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyBRL, formatDateBR } from "@/lib/utils";
 import { Timestamp } from "firebase/firestore";
@@ -16,7 +17,13 @@ function dataColetaTexto(v: FreteDoc["dataColeta"]): string {
   return "—";
 }
 
-export function FreteCard({ frete }: { frete: FreteDoc }) {
+export function FreteCard({
+  frete,
+  acao,
+}: {
+  frete: FreteDoc;
+  acao?: ReactNode;
+}) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-trajetto/30">
       <div className="flex items-start justify-between gap-3">
@@ -61,9 +68,11 @@ export function FreteCard({ frete }: { frete: FreteDoc }) {
           </p>
           <p className="text-xs text-muted-foreground">por {frete.clienteNome}</p>
         </div>
-        <Badge variant="outline" className="font-mono uppercase">
-          {frete.status}
-        </Badge>
+        {acao ?? (
+          <Badge variant="outline" className="font-mono uppercase">
+            {frete.status}
+          </Badge>
+        )}
       </div>
     </article>
   );
