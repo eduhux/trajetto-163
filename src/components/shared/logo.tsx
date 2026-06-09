@@ -1,30 +1,44 @@
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+type Size = "sm" | "md" | "lg";
+
+const SIZE: Record<Size, string> = {
+  sm: "text-xl",
+  md: "text-2xl",
+  lg: "text-4xl",
+};
+
+/**
+ * Wordmark da marca, renderizado como texto (nitido e responsivo).
+ * Le-se TRAJJETO 163, com o "JJ" duplo e o "163" em lime, como no logotipo.
+ */
 export function Logo({
-  className,
-  width = 168,
+  size = "sm",
   href = "/",
+  className,
 }: {
-  className?: string;
-  width?: number;
+  size?: Size;
   href?: string | null;
+  className?: string;
 }) {
-  const img = (
-    <Image
-      src="/logo-completa.svg"
-      alt="Trajetto 163"
-      width={width}
-      height={Math.round((width * 148.218) / 705.42)}
-      priority
-      className={cn("h-auto w-auto select-none", className)}
-    />
+  const mark = (
+    <span
+      className={cn(
+        "select-none font-black uppercase leading-none tracking-tight text-foreground",
+        SIZE[size],
+        className,
+      )}
+    >
+      TRA<span className="text-trajetto">JJ</span>ETO{" "}
+      <span className="text-trajetto">163</span>
+    </span>
   );
-  if (href === null) return img;
+
+  if (href === null) return mark;
   return (
-    <Link href={href} aria-label="Trajetto 163 — início">
-      {img}
+    <Link href={href} aria-label="Trajjeto 163 — início" className="inline-flex">
+      {mark}
     </Link>
   );
 }

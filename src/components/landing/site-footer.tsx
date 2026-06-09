@@ -33,7 +33,7 @@ export function SiteFooter() {
       <div className="container py-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
-            <Logo width={160} href={null} />
+            <Logo size="md" href={null} />
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               Conectando fretes entre São Paulo e Mato Grosso do Sul.
             </p>

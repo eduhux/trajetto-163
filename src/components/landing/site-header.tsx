@@ -32,7 +32,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container flex h-16 items-center justify-between">
-        <Logo width={150} />
+        <Logo size="sm" />
 
         <nav className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
