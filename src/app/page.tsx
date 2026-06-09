@@ -1,27 +1,23 @@
-import Image from "next/image";
+import { SiteHeader } from "@/components/landing/site-header";
+import { Hero } from "@/components/landing/hero";
+import { ComoFunciona } from "@/components/landing/como-funciona";
+import { Recursos } from "@/components/landing/recursos";
+import { Planos } from "@/components/landing/planos";
+import { CtaFinal } from "@/components/landing/cta-final";
+import { SiteFooter } from "@/components/landing/site-footer";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-carbon-950 px-6 text-center">
-      <Image
-        src="/logo-completa.svg"
-        alt="Trajetto 163"
-        width={280}
-        height={59}
-        priority
-      />
-      <div className="max-w-md space-y-3 animate-fade-in">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-trajetto">
-          Fundação instalada
-        </p>
-        <h1 className="text-balance text-2xl font-semibold text-foreground">
-          Conectando fretes entre São Paulo e Mato Grosso do Sul.
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Estrutura, configuração, tipagens, schemas e regras de segurança
-          prontas. A landing page premium chega na próxima etapa.
-        </p>
-      </div>
-    </main>
+    <>
+      <SiteHeader />
+      <main>
+        <Hero />
+        <ComoFunciona />
+        <Recursos />
+        <Planos />
+        <CtaFinal />
+      </main>
+      <SiteFooter />
+    </>
   );
 }
