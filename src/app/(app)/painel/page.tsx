@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { PlusCircle, Search, Package, Truck } from "lucide-react";
+import { PlusCircle, Search, Package, Truck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { PLANOS } from "@/config/planos";
+import { PLANOS, isPremium } from "@/config/planos";
 
 export default function PainelPage() {
   const { perfil } = useAuth();
@@ -68,6 +69,25 @@ export default function PainelPage() {
         <Linha rotulo="Cidade / UF" valor={`${perfil.cidade} · ${perfil.estado}`} />
         <Linha rotulo="Telefone" valor={perfil.telefone} />
       </div>
+
+      {!isPremium(perfil.plano) && (
+        <div className="mt-6 flex max-w-lg flex-col gap-3 rounded-2xl border border-trajetto/30 bg-trajetto/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-trajetto/15 text-trajetto">
+              <Sparkles className="size-5" />
+            </span>
+            <div>
+              <p className="font-medium">Seja Premium</p>
+              <p className="text-sm text-muted-foreground">
+                Publicações ilimitadas e destaque nos anúncios.
+              </p>
+            </div>
+          </div>
+          <Button asChild variant="primary" size="md">
+            <Link href="/planos">Ver planos</Link>
+          </Button>
+        </div>
+      )}
     </main>
   );
 }

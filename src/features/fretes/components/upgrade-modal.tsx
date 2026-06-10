@@ -31,7 +31,7 @@ export function UpgradeModal() {
         </DialogDescription>
         <div className="mt-6 flex flex-col gap-2">
           <Button asChild variant="primary" size="md" onClick={fecharModal}>
-            <Link href="/#planos">Ver planos Premium</Link>
+            <Link href="/planos">Ver planos Premium</Link>
           </Button>
           <Button variant="ghost" size="md" onClick={fecharModal}>
             Agora não

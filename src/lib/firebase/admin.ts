@@ -1,6 +1,7 @@
 /**
  * Firebase Admin - SDK do servidor (apenas em rotas/API, NUNCA no cliente).
- * Usa credenciais de conta de servico vindas das variaveis de ambiente.
+ * Inicializacao "preguicosa": so liga quando uma rota realmente usa, evitando
+ * quebrar o build quando as credenciais nao estao presentes.
  */
 import {
   initializeApp,
@@ -31,7 +32,10 @@ function buildAdminApp(): App {
   });
 }
 
-const adminApp = buildAdminApp();
+export function getAdminAuth(): Auth {
+  return getAuth(buildAdminApp());
+}
 
-export const adminAuth: Auth = getAuth(adminApp);
-export const adminDb: Firestore = getFirestore(adminApp);
+export function getAdminDb(): Firestore {
+  return getFirestore(buildAdminApp());
+}
