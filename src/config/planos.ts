@@ -34,7 +34,7 @@ export const PLANOS: Record<Plano, RegrasPlano> = {
     id: "premium_mensal",
     rotulo: "Premium Mensal",
     precoMensalEquivalente: 99.0,
-    precoCobrado: 99.0,
+    precoCobrado: 1.0, // TESTE TEMPORARIO — voltar para 99.00 apos validar o pagamento
     ciclo: "mensal",
     publicacoesPorMes: Infinity,
     destaqueAnuncios: true,
