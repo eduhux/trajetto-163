@@ -88,7 +88,7 @@ export function BotaoConcluirFrete({
     }
   }
 
-  const motoristas = candidatos?.filter((c) => c.ehMotorista) ?? [];
+  const pessoas = candidatos ?? [];
 
   return (
     <>
@@ -110,11 +110,11 @@ export function BotaoConcluirFrete({
             <div className="flex items-center justify-center py-10 text-muted-foreground">
               <Loader2 className="size-5 animate-spin" />
             </div>
-          ) : motoristas.length === 0 ? (
+          ) : pessoas.length === 0 ? (
             <div className="mt-5">
               <p className="text-sm text-muted-foreground">
-                Nenhum motorista conversou sobre este frete ainda. Você pode
-                apenas marcar como concluído.
+                Ninguém conversou sobre este frete ainda. Você pode apenas
+                marcar como concluído.
               </p>
               <div className="mt-5 flex justify-end gap-3">
                 <Button variant="ghost" size="md" onClick={() => setAberto(false)} disabled={enviando}>
@@ -129,7 +129,7 @@ export function BotaoConcluirFrete({
             <div className="mt-5">
               <p className="mb-2 text-sm font-medium">Quem realizou o frete?</p>
               <div className="space-y-2">
-                {motoristas.map((m) => (
+                {pessoas.map((m) => (
                   <button
                     key={m.uid}
                     type="button"
@@ -147,7 +147,11 @@ export function BotaoConcluirFrete({
                       </span>
                       <span className="font-medium">{m.nome}</span>
                     </span>
-                    <Estrelas valor={m.avaliacaoMedia} total={m.totalAvaliacoes} mostrarNumero tamanho="size-3.5" />
+                    {m.ehMotorista ? (
+                      <Estrelas valor={m.avaliacaoMedia} total={m.totalAvaliacoes} mostrarNumero tamanho="size-3.5" />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">sem avaliações</span>
+                    )}
                   </button>
                 ))}
               </div>

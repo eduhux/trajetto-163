@@ -58,13 +58,6 @@ export async function POST(req: NextRequest) {
       if (frete.clienteUid !== clienteUid) throw new Error("NAO_E_DONO");
       if (frete.status !== "ativo") throw new Error("FRETE_NAO_ATIVO");
       if (avaliacaoSnap.exists) throw new Error("JA_AVALIADO");
-      if (!motoristaSnap.exists) throw new Error("MOTORISTA_INVALIDO");
-
-      const m = motoristaSnap.data()!;
-      const total = (m.totalAvaliacoes as number) ?? 0;
-      const media = (m.avaliacaoMedia as number) ?? 0;
-      const novoTotal = total + 1;
-      const novaMedia = Math.round(((media * total + nota) / novoTotal) * 100) / 100;
 
       tx.update(freteRef, {
         status: "finalizado",
@@ -81,13 +74,23 @@ export async function POST(req: NextRequest) {
         criadoEm: FieldValue.serverTimestamp(),
         atualizadoEm: FieldValue.serverTimestamp(),
       });
-      tx.update(motoristaRef, {
-        avaliacaoMedia: novaMedia,
-        totalAvaliacoes: novoTotal,
-        totalFretesRealizados:
-          ((m.totalFretesRealizados as number) ?? 0) + 1,
-        atualizadoEm: FieldValue.serverTimestamp(),
-      });
+
+      // Soma na reputacao apenas se o avaliado tiver ficha de motorista.
+      if (motoristaSnap.exists) {
+        const m = motoristaSnap.data()!;
+        const total = (m.totalAvaliacoes as number) ?? 0;
+        const media = (m.avaliacaoMedia as number) ?? 0;
+        const novoTotal = total + 1;
+        const novaMedia =
+          Math.round(((media * total + nota) / novoTotal) * 100) / 100;
+        tx.update(motoristaRef, {
+          avaliacaoMedia: novaMedia,
+          totalAvaliacoes: novoTotal,
+          totalFretesRealizados:
+            ((m.totalFretesRealizados as number) ?? 0) + 1,
+          atualizadoEm: FieldValue.serverTimestamp(),
+        });
+      }
     });
 
     return NextResponse.json({ ok: true });
@@ -98,7 +101,6 @@ export async function POST(req: NextRequest) {
       NAO_E_DONO: ["Você não é o dono deste frete.", 403],
       FRETE_NAO_ATIVO: ["Este frete já foi finalizado ou cancelado.", 409],
       JA_AVALIADO: ["Este frete já foi avaliado.", 409],
-      MOTORISTA_INVALIDO: ["O usuário escolhido não é um motorista.", 400],
     };
     if (mapa[msg]) {
       return NextResponse.json({ erro: mapa[msg][0] }, { status: mapa[msg][1] });
