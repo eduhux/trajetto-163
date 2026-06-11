@@ -47,11 +47,9 @@ export async function POST(req: NextRequest) {
     const motoristaRef = db.collection(COLLECTIONS.motoristas).doc(motoristaUid);
 
     await db.runTransaction(async (tx) => {
-      const [freteSnap, avaliacaoSnap, motoristaSnap] = await Promise.all([
-        tx.get(freteRef),
-        tx.get(avaliacaoRef),
-        tx.get(motoristaRef),
-      ]);
+      const freteSnap = await tx.get(freteRef);
+      const avaliacaoSnap = await tx.get(avaliacaoRef);
+      const motoristaSnap = await tx.get(motoristaRef);
 
       if (!freteSnap.exists) throw new Error("FRETE_NAO_ENCONTRADO");
       const frete = freteSnap.data()!;
@@ -107,7 +105,7 @@ export async function POST(req: NextRequest) {
     }
     console.error("Erro ao avaliar:", e);
     return NextResponse.json(
-      { erro: "Não foi possível concluir a avaliação." },
+      { erro: `Não foi possível concluir a avaliação. [diag: ${msg || "sem detalhe"}]` },
       { status: 500 },
     );
   }
