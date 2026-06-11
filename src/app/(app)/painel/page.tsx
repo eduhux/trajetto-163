@@ -4,11 +4,12 @@ import Link from "next/link";
 import { PlusCircle, Search, Package, Truck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Estrelas } from "@/components/shared/estrelas";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { PLANOS, isPremium } from "@/config/planos";
 
 export default function PainelPage() {
-  const { perfil } = useAuth();
+  const { perfil, motorista } = useAuth();
   if (!perfil) return null;
 
   const ehMotorista = perfil.tipoConta === "motorista";
@@ -75,6 +76,25 @@ export default function PainelPage() {
         <Linha rotulo="Cidade / UF" valor={`${perfil.cidade} · ${perfil.estado}`} />
         <Linha rotulo="Telefone" valor={perfil.telefone} />
       </div>
+
+      {ehMotorista && motorista && (
+        <div className="mt-6 max-w-lg rounded-2xl border border-border bg-card p-6">
+          <p className="text-sm font-medium">Sua reputação</p>
+          <div className="mt-3 flex items-center gap-3">
+            <Estrelas
+              valor={motorista.avaliacaoMedia}
+              total={motorista.totalAvaliacoes}
+              mostrarNumero
+              tamanho="size-5"
+            />
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {motorista.totalFretesRealizados > 0
+              ? `${motorista.totalFretesRealizados} frete(s) realizado(s) pela plataforma.`
+              : "Você ainda não realizou fretes avaliados. Conforme concluir fretes, sua reputação aparece aqui."}
+          </p>
+        </div>
+      )}
 
       {!isPremium(perfil.plano) && (
         <div className="mt-6 flex max-w-lg flex-col gap-3 rounded-2xl border border-trajetto/30 bg-trajetto/5 p-5 sm:flex-row sm:items-center sm:justify-between">

@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   increment,
   onSnapshot,
   orderBy,
@@ -143,4 +144,14 @@ export function escutarMensagens(
   return onSnapshot(q, (snap) => {
     cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as MensagemDoc));
   });
+}
+
+/** Busca (uma vez) as conversas de um frete — usado para listar os motoristas que entraram em contato. */
+export async function buscarConversasDoFrete(
+  freteId: string,
+): Promise<ConversaDoc[]> {
+  const snap = await getDocs(
+    query(collection(db, COLLECTIONS.conversas), where("freteId", "==", freteId)),
+  );
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ConversaDoc);
 }

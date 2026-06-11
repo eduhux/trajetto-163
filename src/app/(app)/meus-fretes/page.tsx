@@ -6,6 +6,7 @@ import { PlusCircle, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TelaCarregando } from "@/components/shared/loading";
 import { FreteCard } from "@/features/fretes/components/frete-card";
+import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { listarFretesDoUsuario } from "@/features/fretes/services/frete-service";
 import { regrasDoPlano } from "@/config/planos";
@@ -15,11 +16,16 @@ export default function MeusFretesPage() {
   const { perfil } = useAuth();
   const [fretes, setFretes] = useState<FreteDoc[] | null>(null);
 
-  useEffect(() => {
+  function carregar() {
     if (!perfil) return;
     listarFretesDoUsuario(perfil.uid)
       .then(setFretes)
       .catch(() => setFretes([]));
+  }
+
+  useEffect(() => {
+    carregar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [perfil]);
 
   if (!perfil) return null;
@@ -63,7 +69,15 @@ export default function MeusFretesPage() {
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {fretes.map((f) => (
-            <FreteCard key={f.id} frete={f} />
+            <FreteCard
+              key={f.id}
+              frete={f}
+              acao={
+                f.status === "ativo" ? (
+                  <BotaoConcluirFrete frete={f} onConcluido={carregar} />
+                ) : undefined
+              }
+            />
           ))}
         </div>
       )}

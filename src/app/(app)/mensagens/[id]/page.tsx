@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { MensagemBolha } from "@/features/chat/components/mensagem-bolha";
+import { Estrelas } from "@/components/shared/estrelas";
+import { buscarMotorista } from "@/features/auth/services/auth-service";
 import { AVISO_CONTATO, contemContato } from "@/lib/moderacao/contato";
 import {
   buscarConversa,
@@ -15,7 +17,7 @@ import {
   escutarMensagens,
   marcarLidas,
 } from "@/features/chat/services/chat-service";
-import type { ConversaDoc, MensagemDoc } from "@/types";
+import type { ConversaDoc, MensagemDoc, MotoristaDoc } from "@/types";
 
 export default function ConversaPage() {
   const router = useRouter();
@@ -29,6 +31,7 @@ export default function ConversaPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [motoristaOutro, setMotoristaOutro] = useState<MotoristaDoc | null>(null);
   const fimRef = useRef<HTMLDivElement>(null);
 
   // Carrega a conversa, valida participante e zera nao lidas.
@@ -50,6 +53,16 @@ export default function ConversaPage() {
     const unsub = escutarMensagens(conversaId, setMensagens);
     return () => unsub();
   }, [conversa, conversaId]);
+
+  // Reputacao do outro participante (se for motorista).
+  useEffect(() => {
+    if (!conversa || !perfil) return;
+    const outro = conversa.participantes.find((p) => p !== perfil.uid);
+    if (!outro) return;
+    buscarMotorista(outro)
+      .then(setMotoristaOutro)
+      .catch(() => setMotoristaOutro(null));
+  }, [conversa, perfil]);
 
   // Rolagem automatica ao chegar mensagem nova.
   useEffect(() => {
@@ -105,6 +118,14 @@ export default function ConversaPage() {
           {nomeOutro.charAt(0).toUpperCase()}
         </span>
         <p className="font-medium">{nomeOutro}</p>
+        {motoristaOutro && motoristaOutro.totalAvaliacoes > 0 && (
+          <Estrelas
+            valor={motoristaOutro.avaliacaoMedia}
+            total={motoristaOutro.totalAvaliacoes}
+            mostrarNumero
+            tamanho="size-3.5"
+          />
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto">
