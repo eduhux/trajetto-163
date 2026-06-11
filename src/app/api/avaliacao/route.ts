@@ -104,16 +104,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ erro: mapa[msg][0] }, { status: mapa[msg][1] });
     }
     console.error("Erro ao avaliar:", e);
-    const projId = process.env.FIREBASE_ADMIN_PROJECT_ID || "VAZIO";
-    const emailDom =
-      (process.env.FIREBASE_ADMIN_CLIENT_EMAIL || "").split("@")[1] || "VAZIO";
-    const keyOk = (process.env.FIREBASE_ADMIN_PRIVATE_KEY || "").includes(
-      "BEGIN PRIVATE KEY",
-    );
     return NextResponse.json(
-      {
-        erro: `Não foi possível concluir a avaliação. [diag: ${msg || "sem detalhe"} | proj=${projId} | emailDom=${emailDom} | keyOk=${keyOk}]`,
-      },
+      { erro: "Não foi possível concluir a avaliação. Tente novamente." },
       { status: 500 },
     );
   }
