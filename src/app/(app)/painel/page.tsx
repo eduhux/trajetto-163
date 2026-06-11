@@ -23,6 +23,12 @@ export default function PainelPage() {
         <Badge variant="outline" className="font-mono uppercase">
           Plano {PLANOS[perfil.plano].rotulo}
         </Badge>
+        <Link
+          href="/assinatura"
+          className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Gerenciar assinatura
+        </Link>
       </div>
 
       <h1 className="mt-4 text-2xl font-semibold">

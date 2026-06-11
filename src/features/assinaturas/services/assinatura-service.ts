@@ -29,3 +29,20 @@ export async function iniciarAssinatura(
   // Leva o usuario para o checkout hospedado do Mercado Pago.
   window.location.href = data.initPoint;
 }
+
+/** Cancela a assinatura ativa do usuario. */
+export async function cancelarAssinatura(): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Você precisa estar logado.");
+
+  const idToken = await user.getIdToken();
+  const res = await fetch("/api/assinatura/cancelar", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+
+  const data = (await res.json()) as { ok?: boolean; erro?: string };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.erro ?? "Não foi possível cancelar a assinatura.");
+  }
+}

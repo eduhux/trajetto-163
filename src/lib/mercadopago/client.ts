@@ -72,6 +72,22 @@ export async function buscarPreapproval(id: string): Promise<PreapprovalResposta
   return (await res.json()) as PreapprovalResposta;
 }
 
+/** Cancela uma assinatura no MP (nao haverá novas cobranças). */
+export async function cancelarPreapproval(id: string): Promise<void> {
+  const res = await fetch(`${MP_BASE}/preapproval/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: "cancelled" }),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Falha ao cancelar preapproval (${res.status}): ${txt}`);
+  }
+}
+
 /**
  * Valida a assinatura do webhook do Mercado Pago (header x-signature).
  * Se MP_WEBHOOK_SECRET nao estiver definido, pula a verificacao (apenas dev).
