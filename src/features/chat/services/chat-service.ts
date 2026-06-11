@@ -146,12 +146,19 @@ export function escutarMensagens(
   });
 }
 
-/** Busca (uma vez) as conversas de um frete — usado para listar os motoristas que entraram em contato. */
+/** Busca (uma vez) as conversas de um frete das quais o usuario participa — usado para listar quem entrou em contato. */
 export async function buscarConversasDoFrete(
   freteId: string,
+  uid: string,
 ): Promise<ConversaDoc[]> {
+  // Filtra por participante (exigencia das regras) e depois pelo frete no cliente.
   const snap = await getDocs(
-    query(collection(db, COLLECTIONS.conversas), where("freteId", "==", freteId)),
+    query(
+      collection(db, COLLECTIONS.conversas),
+      where("participantes", "array-contains", uid),
+    ),
   );
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ConversaDoc);
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as ConversaDoc)
+    .filter((c) => c.freteId === freteId);
 }

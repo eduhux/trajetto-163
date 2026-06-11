@@ -20,7 +20,7 @@ export async function buscarCandidatosMotorista(
   freteId: string,
   clienteUid: string,
 ): Promise<CandidatoMotorista[]> {
-  const conversas = await buscarConversasDoFrete(freteId);
+  const conversas = await buscarConversasDoFrete(freteId, clienteUid);
   const vistos = new Set<string>();
   const candidatos: CandidatoMotorista[] = [];
 
