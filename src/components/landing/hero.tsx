@@ -8,33 +8,28 @@ import { Badge } from "@/components/ui/badge";
 import { Corridor, CidadesMarquee } from "./corridor";
 
 const STATS = [
-  { valor: "SP ⇄ MS", label: "os dois estados, ponta a ponta" },
-  { valor: "Todas", label: "as cidades, não só as capitais" },
-  { valor: "Carretas", label: "foco em carga pesada" },
+  { valor: "SP ⇄ MS", label: "os dois estados, ponta a ponta", cor: "text-foreground" },
+  { valor: "Todas", label: "as cidades, não só as capitais", cor: "text-trajetto" },
+  { valor: "Carretas", label: "foco em carga pesada", cor: "text-rodovia-400" },
 ];
 
 const fade: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 18 },
   show: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.1 * i, duration: 0.5, ease: "easeOut" },
+    transition: { delay: 0.08 * i, duration: 0.55, ease: "easeOut" },
   }),
 };
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
-      {/* brilho ambiente sutil */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-trajetto/5 blur-[120px]"
-      />
-
       <div className="container relative">
         <motion.div initial="hidden" animate="show" className="mx-auto max-w-3xl text-center">
           <motion.div variants={fade} custom={0} className="flex justify-center">
-            <Badge variant="lime" className="font-mono uppercase tracking-widest">
+            <Badge variant="lime" className="gap-2 font-mono uppercase tracking-widest">
+              <span className="inline-block size-1.5 rounded-full bg-rodovia-400" />
               Carga pesada · SP ⇄ MS
             </Badge>
           </motion.div>
@@ -42,11 +37,13 @@ export function Hero() {
           <motion.h1
             variants={fade}
             custom={1}
-            className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
+            className="mt-6 text-balance font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight md:text-7xl"
           >
             Fretes de carreta entre{" "}
-            <span className="text-trajetto">todas as cidades</span> de São Paulo
-            e Mato Grosso do Sul.
+            <span className="bg-gradient-to-r from-trajetto via-trajetto to-trajetto-200 bg-clip-text text-transparent">
+              todas as cidades
+            </span>{" "}
+            de São Paulo e Mato Grosso do Sul.
           </motion.h1>
 
           <motion.p
@@ -76,45 +73,59 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Assinatura: o corredor com varias cidades */}
+        {/* Assinatura: o corredor, emoldurado como um painel */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="mx-auto mt-14 max-w-4xl"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.7, ease: "easeOut" }}
+          className="relative mx-auto mt-16 max-w-4xl"
         >
-          <Corridor />
+          {/* brilho atras do painel */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-10 -top-10 bottom-0 -z-10 rounded-[2rem] bg-trajetto/10 blur-[90px]"
+          />
+          <div className="surface grain relative overflow-hidden rounded-3xl p-5 md:p-8">
+            <div className="mb-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <span className="inline-block size-1.5 animate-pulse rounded-full bg-trajetto" />
+                rede ao vivo
+              </span>
+              <span>BR-163 · corredor</span>
+            </div>
+            <Corridor />
+          </div>
         </motion.div>
       </div>
 
-      {/* Letreiro de cidades — largura total, reforça "todas as cidades" */}
+      {/* Letreiro de cidades — largura total */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="mt-10"
+        transition={{ delay: 0.85, duration: 0.6 }}
+        className="mt-12"
       >
         <CidadesMarquee />
       </motion.div>
 
       <div className="container relative">
-        {/* Stats em voz de painel (mono) */}
+        {/* Stats em voz de painel */}
         <motion.dl
           initial="hidden"
           animate="show"
-          className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3"
+          className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3"
         >
           {STATS.map((s, i) => (
             <motion.div
               key={s.label}
               variants={fade}
               custom={i + 4}
-              className="bg-card px-6 py-5 text-center"
+              className="surface rounded-2xl px-6 py-6 text-center"
             >
-              <dt className="font-mono text-2xl font-semibold text-foreground">
+              <dt className={`font-display text-3xl font-bold ${s.cor}`}>
                 {s.valor}
               </dt>
-              <dd className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+              <dd className="mt-2 text-xs uppercase tracking-wide text-muted-foreground">
                 {s.label}
               </dd>
             </motion.div>

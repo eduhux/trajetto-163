@@ -71,7 +71,7 @@ export function Planos() {
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-trajetto">
             Planos
           </p>
-          <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight md:text-4xl">
+          <h2 className="mt-3 text-balance font-display text-3xl font-bold tracking-tight md:text-4xl">
             Comece de graça. Cresça quando fizer sentido.
           </h2>
         </Reveal>
@@ -81,10 +81,10 @@ export function Planos() {
             <Reveal key={c.id} delay={i * 0.08}>
               <div
                 className={cn(
-                  "relative flex h-full flex-col rounded-2xl border bg-card p-7",
+                  "surface relative flex h-full flex-col rounded-2xl p-7",
                   c.destaque
-                    ? "border-trajetto/50 shadow-[0_0_0_1px_rgba(158,255,0,0.15),0_24px_60px_-20px_rgba(158,255,0,0.18)]"
-                    : "border-border",
+                    ? "border-trajetto/50 shadow-[0_0_0_1px_rgba(158,255,0,0.18),0_30px_70px_-24px_rgba(158,255,0,0.28)] lg:-translate-y-3"
+                    : "surface-hover",
                 )}
               >
                 {c.selo && (
@@ -99,7 +99,7 @@ export function Planos() {
                 <p className="mt-1 text-sm text-muted-foreground">{c.resumo}</p>
 
                 <div className="mt-5 flex items-baseline gap-1.5">
-                  <span className="font-mono text-3xl font-semibold">{c.preco}</span>
+                  <span className="font-display text-4xl font-bold">{c.preco}</span>
                   <span className="text-sm text-muted-foreground">/ {c.periodo}</span>
                 </div>
 
