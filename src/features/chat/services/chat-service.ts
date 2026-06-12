@@ -16,7 +16,12 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import {
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+} from "firebase/storage";
+import { db, storage } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 import type { ConversaDoc, FreteDoc, MensagemDoc, UserDoc } from "@/types";
 
@@ -101,6 +106,73 @@ export async function enviarMensagem(
 export async function marcarLidas(conversaId: string, uid: string) {
   await updateDoc(doc(db, COLLECTIONS.conversas, conversaId), {
     [`naoLidas.${uid}`]: 0,
+  });
+}
+
+// ===== Anexos (fotos / documentos) =====
+
+export const ANEXO_TAMANHO_MAX = 8 * 1024 * 1024; // 8 MB
+export const ANEXO_TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+export interface AnexoEnviado {
+  url: string;
+  nome: string;
+  tipo: string;
+  ehImagem: boolean;
+}
+
+/** Valida e faz upload de um arquivo para o Storage; retorna os dados do anexo. */
+export async function uploadAnexo(
+  conversaId: string,
+  file: File,
+): Promise<AnexoEnviado> {
+  if (!ANEXO_TIPOS_OK.includes(file.type)) {
+    throw new Error("Formato não aceito. Envie JPG, PNG, WEBP ou PDF.");
+  }
+  if (file.size > ANEXO_TAMANHO_MAX) {
+    throw new Error("Arquivo muito grande. O limite é 8 MB.");
+  }
+  const nomeLimpo = file.name.replace(/[^\w.\-]/g, "_").slice(-80);
+  const caminho = `conversas/${conversaId}/${Date.now()}_${nomeLimpo}`;
+  const ref = storageRef(storage, caminho);
+  await uploadBytes(ref, file, { contentType: file.type });
+  const url = await getDownloadURL(ref);
+  return {
+    url,
+    nome: file.name,
+    tipo: file.type,
+    ehImagem: file.type.startsWith("image/"),
+  };
+}
+
+/** Envia uma mensagem com anexo (e legenda opcional). */
+export async function enviarAnexo(
+  conversaId: string,
+  autorUid: string,
+  destinatarioUid: string,
+  anexo: AnexoEnviado,
+  legenda = "",
+) {
+  await addDoc(
+    collection(db, COLLECTIONS.conversas, conversaId, COLLECTIONS.mensagens),
+    {
+      conversaId,
+      autorUid,
+      texto: legenda,
+      lida: false,
+      anexoUrl: anexo.url,
+      anexoNome: anexo.nome,
+      anexoTipo: anexo.tipo,
+      anexoEhImagem: anexo.ehImagem,
+      criadoEm: serverTimestamp(),
+      atualizadoEm: serverTimestamp(),
+    },
+  );
+  await updateDoc(doc(db, COLLECTIONS.conversas, conversaId), {
+    ultimaMensagem: anexo.ehImagem ? "📷 Foto" : "📎 Documento",
+    ultimaMensagemEm: serverTimestamp(),
+    [`naoLidas.${destinatarioUid}`]: increment(1),
+    atualizadoEm: serverTimestamp(),
   });
 }
 

@@ -64,6 +64,11 @@ export interface MensagemDoc extends BaseDocument {
   autorUid: string;
   texto: string;
   lida: boolean;
+  // Anexo opcional (foto/documento enviado pelo Storage)
+  anexoUrl?: string | null;
+  anexoNome?: string | null;
+  anexoTipo?: string | null; // mime type
+  anexoEhImagem?: boolean;
 }
 
 /** Documento `avaliacoes/{id}`. Avaliacao de um motorista apos um frete. */

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, SendHorizonal } from "lucide-react";
+import { ArrowLeft, Loader2, Paperclip, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -13,9 +13,11 @@ import { buscarMotorista } from "@/features/auth/services/auth-service";
 import { AVISO_CONTATO, contemContato } from "@/lib/moderacao/contato";
 import {
   buscarConversa,
+  enviarAnexo,
   enviarMensagem,
   escutarMensagens,
   marcarLidas,
+  uploadAnexo,
 } from "@/features/chat/services/chat-service";
 import type { ConversaDoc, MensagemDoc, MotoristaDoc } from "@/types";
 
@@ -32,7 +34,9 @@ export default function ConversaPage() {
   const [enviando, setEnviando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
   const [motoristaOutro, setMotoristaOutro] = useState<MotoristaDoc | null>(null);
+  const [enviandoAnexo, setEnviandoAnexo] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
+  const arquivoRef = useRef<HTMLInputElement>(null);
 
   // Carrega a conversa, valida participante e zera nao lidas.
   useEffect(() => {
@@ -104,6 +108,22 @@ export default function ConversaPage() {
     }
   }
 
+  async function aoEscolherArquivo(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permite reenviar o mesmo arquivo depois
+    if (!file || enviandoAnexo) return;
+    setAviso(null);
+    setEnviandoAnexo(true);
+    try {
+      const anexo = await uploadAnexo(conversaId, file);
+      await enviarAnexo(conversaId, perfil!.uid, outroUid, anexo);
+    } catch (err) {
+      setAviso(err instanceof Error ? err.message : "Falha ao enviar o arquivo.");
+    } finally {
+      setEnviandoAnexo(false);
+    }
+  }
+
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col md:h-[calc(100vh-8rem)]">
       <div className="container flex max-w-2xl items-center gap-3 border-b border-border py-3">
@@ -150,6 +170,27 @@ export default function ConversaPage() {
             </p>
           )}
           <div className="flex items-center gap-2">
+            <input
+              ref={arquivoRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              className="hidden"
+              onChange={aoEscolherArquivo}
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => arquivoRef.current?.click()}
+              disabled={enviandoAnexo}
+              aria-label="Anexar foto ou documento"
+              title="Anexar foto ou documento"
+            >
+              {enviandoAnexo ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Paperclip className="size-4" />
+              )}
+            </Button>
             <Input
               value={texto}
               onChange={(e) => {

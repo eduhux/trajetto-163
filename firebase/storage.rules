@@ -10,6 +10,12 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    function anexoChatValido() {
+      return request.resource.size < 8 * 1024 * 1024
+        && (request.resource.contentType.matches('image/.*')
+            || request.resource.contentType == 'application/pdf');
+    }
+
     // Foto de perfil: dono escreve, leitura publica.
     match /perfis/{uid}/{arquivo} {
       allow read: if true;
@@ -26,6 +32,14 @@ service firebase.storage {
     match /banners/{arquivo} {
       allow read: if true;
       allow write: if false;
+    }
+
+    // Anexos do chat (fotos/documentos trocados na negociacao do frete).
+    // Apenas usuarios logados. O link so aparece dentro da conversa, que e
+    // protegida no Firestore (somente os participantes a leem).
+    match /conversas/{conversaId}/{arquivo} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && anexoChatValido();
     }
   }
 }
