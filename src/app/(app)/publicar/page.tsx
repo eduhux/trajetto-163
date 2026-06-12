@@ -9,9 +9,9 @@ export default function PublicarPage() {
 
   return (
     <main className="container max-w-2xl py-10">
-      <h1 className="text-2xl font-semibold">Publicar frete</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight">Publicar frete</h1>
       <p className="mt-1 text-muted-foreground">
-        Preencha os dados da carga. Os motoristas do corredor verão seu anúncio.
+        Preencha os dados da carga. Os carreteiros que rodam SP ⇄ MS vão ver seu anúncio.
       </p>
 
       {ehMotorista ? (

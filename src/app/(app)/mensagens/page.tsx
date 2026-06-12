@@ -34,7 +34,7 @@ export default function MensagensPage() {
 
   return (
     <main className="container max-w-2xl py-10">
-      <h1 className="text-2xl font-semibold">Mensagens</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight">Mensagens</h1>
       <p className="mt-1 text-muted-foreground">Suas conversas sobre fretes.</p>
 
       {conversas === null ? (

@@ -58,7 +58,7 @@ export default function MinhaAssinaturaPage() {
 
   return (
     <main className="container max-w-xl py-10">
-      <h1 className="text-2xl font-semibold">Minha assinatura</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight">Minha assinatura</h1>
       <p className="mt-1 text-muted-foreground">
         Gerencie seu plano do Trajjeto 163.
       </p>

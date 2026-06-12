@@ -106,9 +106,9 @@ export default function FretesPage() {
 
   return (
     <main className="container py-10">
-      <h1 className="text-2xl font-semibold">Fretes disponíveis</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight">Fretes disponíveis</h1>
       <p className="mt-1 text-muted-foreground">
-        Encontre cargas no corredor MS ⇄ SP.
+        Carga pesada esperando carreta entre todas as cidades de SP e MS.
       </p>
 
       {todos === null ? (

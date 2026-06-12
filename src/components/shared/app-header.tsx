@@ -48,7 +48,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-carbon-950/80 backdrop-blur">
+    <header className="glass sticky top-0 z-40">
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
           <Logo size="sm" />
@@ -62,7 +62,7 @@ export function AppHeader() {
                   className={cn(
                     "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                     ativo
-                      ? "bg-secondary text-foreground"
+                      ? "bg-trajetto/10 text-trajetto ring-1 ring-inset ring-trajetto/20"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -88,7 +88,7 @@ export function AppHeader() {
               href={n.href}
               className={cn(
                 "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors",
-                ativo ? "bg-secondary text-foreground" : "text-muted-foreground",
+                ativo ? "bg-trajetto/10 text-trajetto" : "text-muted-foreground",
               )}
             >
               <n.icon className="size-3.5" /> {n.label}

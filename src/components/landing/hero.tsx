@@ -39,11 +39,11 @@ export function Hero() {
             custom={1}
             className="mt-6 text-balance font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight md:text-7xl"
           >
-            Fretes de carreta entre{" "}
+            Carga pesada rodando entre{" "}
             <span className="bg-gradient-to-r from-trajetto via-trajetto to-trajetto-200 bg-clip-text text-transparent">
               todas as cidades
             </span>{" "}
-            de São Paulo e Mato Grosso do Sul.
+            de SP e MS.
           </motion.h1>
 
           <motion.p
@@ -51,8 +51,8 @@ export function Hero() {
             custom={2}
             className="mx-auto mt-6 max-w-xl text-balance text-base text-muted-foreground md:text-lg"
           >
-            De capital a interior, dos dois estados. Quem precisa mover carga
-            pesada encontra quem roda de carreta — direto, sem intermediário.
+            O ponto de encontro de quem manda carga e quem roda de carreta. Da
+            capital ao interior, direto — sem atravessador tirando sua margem.
           </motion.p>
 
           <motion.div

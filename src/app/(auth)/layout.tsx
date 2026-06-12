@@ -25,12 +25,19 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   if (carregando) return <TelaCarregando />;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-carbon-950 px-5 py-12">
+    <main className="relative flex min-h-screen items-center justify-center px-5 py-12">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/4 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-trajetto/10 blur-[110px]"
+      />
       <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
+        <div className="mb-3 flex justify-center">
           <Logo size="md" />
         </div>
-        <div className="rounded-2xl border border-border bg-card p-7 shadow-2xl">
+        <p className="mb-8 text-center font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          Fretes de carreta · SP ⇄ MS
+        </p>
+        <div className="surface grain relative overflow-hidden rounded-2xl p-7 shadow-2xl">
           {children}
         </div>
       </div>

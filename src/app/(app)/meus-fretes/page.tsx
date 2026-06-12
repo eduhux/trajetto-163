@@ -42,7 +42,7 @@ export default function MeusFretesPage() {
     <main className="container py-10">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Meus fretes</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Meus fretes</h1>
           {limite !== Infinity && (
             <p className="mt-1 text-sm text-muted-foreground">
               Plano gratuito: {usadosMes} de {limite} publicações usadas este mês.

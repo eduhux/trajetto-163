@@ -8,13 +8,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Acao principal: lime da marca sobre carbono
+        // Acao principal: lime da marca sobre carbono, com brilho
         primary:
-          "bg-trajetto text-carbon-950 font-semibold hover:bg-trajetto-300 active:bg-trajetto-500",
+          "bg-trajetto text-carbon-950 font-semibold shadow-[0_10px_34px_-10px_rgba(158,255,0,0.55)] hover:bg-trajetto-300 hover:shadow-[0_14px_44px_-10px_rgba(158,255,0,0.7)] active:bg-trajetto-500 active:scale-[0.98]",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         outline:
-          "border border-border bg-transparent hover:bg-secondary hover:text-secondary-foreground",
+          "border border-border bg-transparent hover:border-trajetto/40 hover:bg-secondary hover:text-foreground",
         ghost: "hover:bg-secondary hover:text-secondary-foreground",
         link: "text-trajetto underline-offset-4 hover:underline",
         destructive:

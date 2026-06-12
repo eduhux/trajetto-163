@@ -32,13 +32,13 @@ export default function PainelPage() {
         </Link>
       </div>
 
-      <h1 className="mt-4 text-2xl font-semibold">
-        Olá, {perfil.nomeCompleto.split(" ")[0]} 👋
+      <h1 className="mt-4 font-display text-3xl font-bold tracking-tight">
+        Olá, {perfil.nomeCompleto.split(" ")[0]}
       </h1>
       <p className="mt-1 text-muted-foreground">
         {ehMotorista
-          ? "Encontre cargas no corredor que você roda."
-          : "Publique um frete ou acompanhe os seus anúncios."}
+          ? "Cargas pesadas esperando carreta nas cidades que você roda."
+          : "Publique uma carga ou acompanhe seus anúncios no corredor."}
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">

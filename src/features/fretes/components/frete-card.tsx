@@ -25,7 +25,7 @@ export function FreteCard({
   acao?: ReactNode;
 }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-trajetto/30">
+    <article className="surface surface-hover rounded-2xl p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 font-medium">
           <span>{frete.cidadeOrigem}</span>
@@ -63,7 +63,7 @@ export function FreteCard({
 
       <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
         <div>
-          <p className="font-mono text-lg font-semibold text-foreground">
+          <p className="font-display text-xl font-bold text-foreground">
             {formatCurrencyBRL(frete.valorFrete)}
           </p>
           <p className="text-xs text-muted-foreground">por {frete.clienteNome}</p>

@@ -26,7 +26,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-carbon-950">
+    <div className="min-h-screen">
       <AppHeader />
       {children}
       <UpgradeModal />

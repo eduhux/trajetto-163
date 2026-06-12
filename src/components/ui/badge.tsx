@@ -9,6 +9,7 @@ const badgeVariants = cva(
       variant: {
         default: "border-transparent bg-secondary text-secondary-foreground",
         lime: "border-trajetto/30 bg-trajetto/10 text-trajetto",
+        rodovia: "border-rodovia-400/30 bg-rodovia-400/10 text-rodovia-400",
         outline: "border-border text-foreground",
       },
     },

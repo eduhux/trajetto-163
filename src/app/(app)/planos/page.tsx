@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Planos" };
 export default function PlanosPage() {
   return (
     <main className="container max-w-3xl py-10">
-      <h1 className="text-2xl font-semibold">Seja Premium</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight">Seja Premium</h1>
       <p className="mt-1 text-muted-foreground">
         Publique sem limites e ganhe destaque no corredor MS ⇄ SP.
       </p>
