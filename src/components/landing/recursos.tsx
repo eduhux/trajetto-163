@@ -4,8 +4,8 @@ import { MapPin, MessageSquare, ShieldCheck, Star, Zap, BarChart3 } from "lucide
 const RECURSOS = [
   {
     icone: MapPin,
-    titulo: "Especialista no corredor",
-    desc: "Nada de plataforma genérica para o Brasil inteiro. Aqui é MS ⇄ SP, ponta a ponta.",
+    titulo: "Todas as cidades de SP e MS",
+    desc: "Nada de plataforma genérica para o Brasil inteiro. Aqui é SP ⇄ MS, de capital a interior, com foco em carreta.",
   },
   {
     icone: MessageSquare,
@@ -14,7 +14,7 @@ const RECURSOS = [
   },
   {
     icone: ShieldCheck,
-    titulo: "Motoristas com perfil",
+    titulo: "Carreteiros com perfil",
     desc: "CNH, veículo e capacidade de carga no perfil. Você sabe com quem está fechando.",
   },
   {

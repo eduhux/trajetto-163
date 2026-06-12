@@ -30,6 +30,13 @@ const config: Config = {
           800: "#386b08",
           900: "#2f590e",
         },
+        // Cor secundaria: ambar de sinalizacao rodoviaria (BR-163), usada com parcimonia.
+        rodovia: {
+          DEFAULT: "#f5a623",
+          300: "#ffd27a",
+          400: "#f5a623",
+          500: "#e2920f",
+        },
         // Fundo escuro institucional (corredor noturno / asfalto)
         carbon: {
           DEFAULT: "#0a0c0a",

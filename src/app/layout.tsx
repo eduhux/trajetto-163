@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Trajjeto 163",
   },
   description:
-    "Conectando fretes entre São Paulo e Mato Grosso do Sul. O marketplace especializado no corredor logístico MS ⇄ SP.",
+    "O marketplace de fretes de carga pesada entre todas as cidades de São Paulo e Mato Grosso do Sul. Carreteiros e embarcadores conectados direto, sem intermediário.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),

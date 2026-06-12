@@ -91,3 +91,15 @@
     text-wrap: balance;
   }
 }
+
+/* Letreiro de cidades (marquee) — usado na landing */
+@keyframes trajetto-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: trajetto-marquee 32s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}

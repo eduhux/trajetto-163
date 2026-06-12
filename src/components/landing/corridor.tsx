@@ -3,13 +3,26 @@
 import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
-// Trajeto do corredor (esquerda = MS, direita = SP), curva organica.
-const ROTA = "M 70 150 C 250 60 420 230 560 120 S 760 70 830 90";
+// Estrada organica ligando MS (esquerda) a SP (direita).
+const ROTA = "M 50 175 C 220 70 350 225 520 145 S 760 60 860 85";
 
-/** Pequenas marcas de km ao longo da rota (decorativas, padrao sinalizacao). */
-const MARCADORES = [
-  { x: 70, y: 150, label: "KM 0", cidade: "Campo Grande · MS" },
-  { x: 830, y: 90, label: "KM 1014", cidade: "São Paulo · SP" },
+// Cidades ao longo do caminho (pontos aproximados sobre a rota).
+// As pontas sao os estados; os pontos do meio representam as muitas cidades no trajeto.
+const NOS = [
+  { x: 50, y: 175, forte: true },
+  { x: 200, y: 120, forte: false },
+  { x: 360, y: 188, forte: false },
+  { x: 520, y: 145, forte: false },
+  { x: 690, y: 99, forte: false },
+  { x: 860, y: 85, forte: true },
+];
+
+// Cidades de MS e SP que rolam no letreiro (amostra — a ideia e "todas as cidades").
+const CIDADES = [
+  "Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã",
+  "Naviraí", "Aquidauana", "Nova Andradina", "Paranaíba", "Coxim",
+  "São Paulo", "Campinas", "Bauru", "Presidente Prudente", "Ribeirão Preto",
+  "São José do Rio Preto", "Marília", "Araçatuba", "Sorocaba", "Santos",
 ];
 
 export function Corridor() {
@@ -18,17 +31,17 @@ export function Corridor() {
   return (
     <div className="relative w-full">
       <svg
-        viewBox="0 0 900 240"
+        viewBox="0 0 900 250"
         fill="none"
         className="w-full"
         role="img"
-        aria-label="Corredor logístico entre Campo Grande (MS) e São Paulo (SP)"
+        aria-label="Rede de fretes ligando todas as cidades de Mato Grosso do Sul e São Paulo"
       >
         <defs>
           <linearGradient id="rota-grad" x1="0" y1="0" x2="900" y2="0">
-            <stop offset="0%" stopColor="#9eff00" stopOpacity="0.25" />
+            <stop offset="0%" stopColor="#9eff00" stopOpacity="0.3" />
             <stop offset="55%" stopColor="#9eff00" stopOpacity="1" />
-            <stop offset="100%" stopColor="#9eff00" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#9eff00" stopOpacity="0.6" />
           </linearGradient>
           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="4" result="b" />
@@ -39,16 +52,30 @@ export function Corridor() {
           </filter>
         </defs>
 
-        {/* Trilho de base (asfalto tracejado) */}
+        {/* Asfalto (corpo da estrada) */}
+        <path d={ROTA} stroke="hsl(140 8% 16%)" strokeWidth="16" strokeLinecap="round" />
+
+        {/* Faixa de sinalizacao amarela (rodovia) que "corre" */}
         <path
           d={ROTA}
-          stroke="hsl(140 8% 18%)"
-          strokeWidth="2"
-          strokeDasharray="2 8"
+          stroke="#f5a623"
+          strokeWidth="2.5"
           strokeLinecap="round"
-        />
+          strokeDasharray="10 16"
+          opacity="0.9"
+        >
+          {!reduced && (
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="-52"
+              dur="1.1s"
+              repeatCount="indefinite"
+            />
+          )}
+        </path>
 
-        {/* Rota lime que se desenha */}
+        {/* Traco lime de marca, desenhando-se */}
         <motion.path
           d={ROTA}
           stroke="url(#rota-grad)"
@@ -57,45 +84,80 @@ export function Corridor() {
           filter="url(#glow)"
           initial={reduced ? { pathLength: 1 } : { pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 2, ease: "easeInOut" }}
+          transition={{ duration: 1.8, ease: "easeInOut" }}
         />
 
-        {/* Nós das pontas */}
-        {MARCADORES.map((m, i) => (
-          <g key={m.label}>
-            <circle cx={m.x} cy={m.y} r="9" fill="#0a0c0a" stroke="#9eff00" strokeWidth="2" />
-            <circle cx={m.x} cy={m.y} r="3.5" fill="#9eff00" />
-            <text
-              x={m.x}
-              y={i === 0 ? m.y + 34 : m.y - 24}
-              textAnchor={i === 0 ? "start" : "end"}
-              className="fill-trajetto font-mono"
-              fontSize="11"
-              letterSpacing="1"
-            >
-              {m.label}
-            </text>
-            <text
-              x={m.x}
-              y={i === 0 ? m.y + 50 : m.y - 8}
-              textAnchor={i === 0 ? "start" : "end"}
-              className="fill-muted-foreground font-mono"
-              fontSize="10"
-            >
-              {m.cidade}
-            </text>
+        {/* Nos (cidades) */}
+        {NOS.map((n, i) => (
+          <g key={i}>
+            {n.forte && (
+              <circle cx={n.x} cy={n.y} r="13" fill="#9eff00" opacity="0.12">
+                {!reduced && (
+                  <animate
+                    attributeName="r"
+                    values="11;16;11"
+                    dur="2.6s"
+                    repeatCount="indefinite"
+                  />
+                )}
+              </circle>
+            )}
+            <circle
+              cx={n.x}
+              cy={n.y}
+              r={n.forte ? 7 : 4.5}
+              fill="#0a0c0a"
+              stroke="#9eff00"
+              strokeWidth={n.forte ? 2.5 : 1.8}
+            />
+            <circle cx={n.x} cy={n.y} r={n.forte ? 3 : 2} fill="#9eff00" />
           </g>
         ))}
 
-        {/* Caminhao percorrendo a BR-163 */}
-        <g transform={reduced ? "translate(830 90)" : undefined}>
-          <rect x="-11" y="-7" width="22" height="14" rx="3" fill="#9eff00" />
-          <rect x="-11" y="-7" width="7" height="14" rx="2" fill="#0a0c0a" opacity="0.25" />
+        {/* Rotulos dos estados nas pontas */}
+        <text x="50" y="208" textAnchor="start" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="1">
+          MS
+        </text>
+        <text x="50" y="224" textAnchor="start" className="fill-muted-foreground font-mono" fontSize="9.5">
+          todas as cidades
+        </text>
+        <text x="860" y="118" textAnchor="end" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="1">
+          SP
+        </text>
+        <text x="860" y="134" textAnchor="end" className="fill-muted-foreground font-mono" fontSize="9.5">
+          todas as cidades
+        </text>
+
+        {/* Carreta percorrendo a estrada */}
+        <g>
+          {/* cavalo + carreta estilizados */}
+          <rect x="-13" y="-6" width="9" height="12" rx="2" fill="#9eff00" />
+          <rect x="-3" y="-7" width="16" height="14" rx="2" fill="#9eff00" />
+          <rect x="-3" y="-7" width="16" height="14" rx="2" fill="#0a0c0a" opacity="0.18" />
           {!reduced && (
-            <animateMotion dur="6s" repeatCount="indefinite" rotate="auto" path={ROTA} />
+            <animateMotion dur="7s" repeatCount="indefinite" rotate="auto" path={ROTA} />
           )}
         </g>
       </svg>
+    </div>
+  );
+}
+
+/** Letreiro rolante com cidades de MS e SP — reforça "todas as cidades". */
+export function CidadesMarquee() {
+  const lista = [...CIDADES, ...CIDADES]; // duplicado para loop continuo
+  return (
+    <div className="relative overflow-hidden border-y border-border bg-card/40 py-3">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent" />
+      <div className="flex w-max animate-marquee items-center gap-3">
+        {lista.map((c, i) => (
+          <span key={i} className="flex items-center gap-3 whitespace-nowrap">
+            <span className="text-sm text-muted-foreground">{c}</span>
+            <span className="size-1 rounded-full bg-trajetto/60" />
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
