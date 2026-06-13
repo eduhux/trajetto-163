@@ -10,6 +10,7 @@ import {
   Boxes,
   MessageSquare,
   PackageCheck,
+  Shield,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,10 @@ export function AppHeader() {
         { href: "/meus-fretes", label: "Meus fretes", icon: Boxes },
         { href: "/mensagens", label: "Mensagens", icon: MessageSquare },
       ];
+
+  if (perfil?.admin) {
+    NAV.push({ href: "/admin", label: "Admin", icon: Shield });
+  }
 
   // Mantem o contador global de mensagens nao lidas atualizado.
   useTotalNaoLidas();
