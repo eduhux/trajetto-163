@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -102,9 +102,18 @@ export function BotaoConcluirFrete({
             Concluir e avaliar
           </DialogTitle>
           <DialogDescription className="mt-1 text-sm text-muted-foreground">
-            Escolha o motorista que realizou o frete e dê uma nota. Isso ajuda
+            Escolha o carreteiro que realizou o frete e dê uma nota. Isso ajuda
             outros clientes a confiarem na plataforma.
           </DialogDescription>
+
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-rodovia-400/30 bg-rodovia-400/10 p-3 text-sm text-rodovia-300">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span>
+              Conclua <strong className="font-semibold">somente quando a carga
+              for entregue no destino em segurança</strong>. Ao concluir, o frete
+              sai do ar e o contato com o carreteiro é encerrado.
+            </span>
+          </div>
 
           {carregando ? (
             <div className="flex items-center justify-center py-10 text-muted-foreground">
@@ -170,7 +179,7 @@ export function BotaoConcluirFrete({
                   onChange={(e) => setComentario(e.target.value)}
                   rows={3}
                   maxLength={400}
-                  placeholder="Como foi a experiência com este motorista?"
+                  placeholder="Como foi a experiência com este carreteiro?"
                   className="w-full resize-none rounded-lg border border-border bg-background p-3 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-trajetto"
                 />
               </div>

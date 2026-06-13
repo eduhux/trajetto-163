@@ -1,15 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PlusCircle, Search, Package, Truck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Estrelas } from "@/components/shared/estrelas";
+import { OnboardingTutorial } from "@/components/shared/onboarding-tutorial";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { PLANOS, isPremium } from "@/config/planos";
 
 export default function PainelPage() {
   const { perfil, motorista } = useAuth();
+  const [mostrarTutorial, setMostrarTutorial] = useState(false);
+
+  // Mostra o mini tutorial no primeiro acesso (marca local por usuário).
+  useEffect(() => {
+    if (!perfil) return;
+    const chave = `trajetto_onboarding_${perfil.uid}`;
+    if (localStorage.getItem(chave) !== "1") {
+      setMostrarTutorial(true);
+    }
+  }, [perfil]);
+
+  function fecharTutorial() {
+    if (perfil) localStorage.setItem(`trajetto_onboarding_${perfil.uid}`, "1");
+    setMostrarTutorial(false);
+  }
+
   if (!perfil) return null;
 
   const ehMotorista = perfil.tipoConta === "motorista";
@@ -113,6 +131,10 @@ export default function PainelPage() {
             <Link href="/planos">Ver planos</Link>
           </Button>
         </div>
+      )}
+
+      {mostrarTutorial && (
+        <OnboardingTutorial tipoConta={perfil.tipoConta} onClose={fecharTutorial} />
       )}
     </main>
   );
