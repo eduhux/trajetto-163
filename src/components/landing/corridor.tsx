@@ -1,48 +1,63 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
-/* ---------- Dados do mapa (estilizado: MS a esquerda, SP a direita) ---------- */
+/* ---------- Mapa de rede (estilizado): MS a esquerda, SP a direita ---------- */
 
 type No = { x: number; y: number; uf: "MS" | "SP"; hub?: boolean; nome?: string };
 
 const NOS: No[] = [
-  // MS (0..8)
-  { x: 250, y: 250, uf: "MS", hub: true, nome: "Campo Grande" }, // 0
-  { x: 95, y: 215, uf: "MS", nome: "Corumbá" }, // 1
-  { x: 175, y: 250, uf: "MS" }, // 2 Aquidauana
-  { x: 270, y: 150, uf: "MS" }, // 3 Coxim
-  { x: 385, y: 130, uf: "MS" }, // 4 Paranaíba
-  { x: 380, y: 225, uf: "MS", nome: "Três Lagoas" }, // 5
-  { x: 250, y: 350, uf: "MS", nome: "Dourados" }, // 6
-  { x: 195, y: 395, uf: "MS" }, // 7 Ponta Porã
-  { x: 320, y: 360, uf: "MS" }, // 8 Naviraí
-  // SP (9..18)
-  { x: 800, y: 345, uf: "SP", hub: true, nome: "São Paulo" }, // 9
-  { x: 730, y: 300, uf: "SP", nome: "Campinas" }, // 10
-  { x: 660, y: 275, uf: "SP", nome: "Bauru" }, // 11
-  { x: 640, y: 175, uf: "SP" }, // 12 S. J. Rio Preto
-  { x: 725, y: 165, uf: "SP" }, // 13 Ribeirão Preto
-  { x: 560, y: 230, uf: "SP" }, // 14 Araçatuba
-  { x: 510, y: 305, uf: "SP", nome: "Pres. Prudente" }, // 15
-  { x: 605, y: 320, uf: "SP" }, // 16 Marília
-  { x: 745, y: 365, uf: "SP" }, // 17 Sorocaba
-  { x: 820, y: 400, uf: "SP" }, // 18 Santos
+  // MS (0..12)
+  { x: 245, y: 250, uf: "MS", hub: true, nome: "Campo Grande" }, // 0
+  { x: 90, y: 210, uf: "MS", nome: "Corumbá" }, // 1
+  { x: 165, y: 245, uf: "MS" }, // 2 Aquidauana
+  { x: 265, y: 140, uf: "MS" }, // 3 Coxim
+  { x: 395, y: 120, uf: "MS" }, // 4 Paranaíba
+  { x: 385, y: 215, uf: "MS", nome: "Três Lagoas" }, // 5
+  { x: 240, y: 350, uf: "MS", nome: "Dourados" }, // 6
+  { x: 185, y: 400, uf: "MS" }, // 7 Ponta Porã
+  { x: 315, y: 365, uf: "MS" }, // 8 Naviraí
+  { x: 350, y: 300, uf: "MS" }, // 9 Nova Andradina
+  { x: 210, y: 320, uf: "MS" }, // 10 Maracaju
+  { x: 200, y: 275, uf: "MS" }, // 11 Sidrolândia
+  { x: 370, y: 340, uf: "MS" }, // 12 Bataguassu
+  // SP (13..28)
+  { x: 805, y: 350, uf: "SP", hub: true, nome: "São Paulo" }, // 13
+  { x: 735, y: 300, uf: "SP", nome: "Campinas" }, // 14
+  { x: 655, y: 275, uf: "SP", nome: "Bauru" }, // 15
+  { x: 635, y: 170, uf: "SP" }, // 16 SJ Rio Preto
+  { x: 720, y: 160, uf: "SP" }, // 17 Ribeirão Preto
+  { x: 560, y: 225, uf: "SP" }, // 18 Araçatuba
+  { x: 505, y: 300, uf: "SP", nome: "Pres. Prudente" }, // 19
+  { x: 600, y: 320, uf: "SP" }, // 20 Marília
+  { x: 750, y: 365, uf: "SP" }, // 21 Sorocaba
+  { x: 828, y: 408, uf: "SP" }, // 22 Santos
+  { x: 705, y: 330, uf: "SP" }, // 23 Piracicaba
+  { x: 680, y: 222, uf: "SP" }, // 24 São Carlos
+  { x: 762, y: 118, uf: "SP" }, // 25 Franca
+  { x: 690, y: 362, uf: "SP" }, // 26 Botucatu
+  { x: 772, y: 322, uf: "SP" }, // 27 Jundiaí
+  { x: 792, y: 288, uf: "SP" }, // 28 Bragança P.
 ];
 
-// Conexoes internas de cada estado (rede lime, discretas)
 const REDE: [number, number][] = [
-  [0, 1], [0, 2], [0, 3], [0, 5], [0, 6], [3, 4], [4, 5], [6, 7], [6, 8], [2, 1], [5, 8],
-  [9, 10], [10, 11], [11, 12], [12, 13], [10, 13], [11, 14], [14, 15], [11, 16], [16, 15], [9, 17], [9, 18], [12, 14],
+  // MS
+  [0, 1], [0, 2], [0, 3], [0, 5], [0, 6], [0, 11], [3, 4], [4, 5], [5, 9],
+  [9, 12], [5, 12], [6, 10], [10, 11], [6, 8], [8, 9], [7, 10], [2, 1], [2, 11], [8, 12],
+  // SP
+  [13, 14], [13, 21], [13, 27], [13, 22], [13, 28], [14, 23], [14, 15], [15, 24],
+  [24, 16], [16, 17], [17, 25], [15, 18], [18, 19], [18, 20], [20, 19], [15, 20],
+  [23, 26], [26, 20], [14, 27], [24, 17], [28, 14], [21, 23],
 ];
 
 // Corredores entre os estados (ambar, animados, com veiculo)
 const CORREDORES: [number, number][] = [
-  [5, 15], // Três Lagoas -> Pres. Prudente
-  [5, 14], // Três Lagoas -> Araçatuba
-  [4, 12], // Paranaíba -> S. J. Rio Preto
-  [0, 15], // Campo Grande -> Pres. Prudente
+  [5, 19],
+  [5, 18],
+  [4, 16],
+  [0, 19],
+  [9, 20],
+  [12, 18],
 ];
 
 const REGIAO_MS = "M 70 130 C 150 95 300 85 405 115 L 410 250 C 360 360 300 405 200 410 C 120 412 75 330 70 250 Z";
@@ -61,47 +76,43 @@ export function Corridor() {
         aria-label="Mapa da rede de fretes conectando cidades de Mato Grosso do Sul e São Paulo"
       >
         <defs>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3.4" result="b" />
+          <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="3.2" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
           <radialGradient id="reg-ms" cx="40%" cy="40%" r="70%">
-            <stop offset="0%" stopColor="#9eff00" stopOpacity="0.08" />
+            <stop offset="0%" stopColor="#9eff00" stopOpacity="0.09" />
             <stop offset="100%" stopColor="#9eff00" stopOpacity="0.01" />
           </radialGradient>
           <radialGradient id="reg-sp" cx="60%" cy="50%" r="70%">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.07" />
+            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.08" />
             <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.01" />
           </radialGradient>
         </defs>
 
-        {/* Regioes dos estados (fundo) */}
+        {/* Regioes dos estados */}
         <path d={REGIAO_MS} fill="url(#reg-ms)" stroke="hsl(150 10% 24%)" strokeWidth="1" strokeDasharray="5 6" />
         <path d={REGIAO_SP} fill="url(#reg-sp)" stroke="hsl(150 10% 24%)" strokeWidth="1" strokeDasharray="5 6" />
 
-        {/* Rede interna (linhas discretas) */}
+        {/* Rede interna */}
         {REDE.map(([a, b], i) => (
           <line
             key={`r${i}`}
             x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y}
-            stroke="#9eff00" strokeOpacity="0.18" strokeWidth="1.2"
+            stroke="#9eff00" strokeOpacity="0.16" strokeWidth="1.1"
           />
         ))}
 
         {/* Corredores entre estados (ambar, fluindo) */}
         {CORREDORES.map(([a, b], i) => (
           <g key={`c${i}`}>
+            <line x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y} stroke="#f5a623" strokeOpacity="0.3" strokeWidth="1.5" />
             <line
               x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y}
-              stroke="#f5a623" strokeOpacity="0.32" strokeWidth="1.6"
-            />
-            <line
-              x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y}
-              stroke="#f5a623" strokeWidth="2" strokeLinecap="round"
-              strokeDasharray="2 12"
+              stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 12"
             >
               {!reduced && (
                 <animate attributeName="stroke-dashoffset" from="0" to="-56" dur="1.3s" repeatCount="indefinite" />
@@ -113,12 +124,8 @@ export function Corridor() {
         {/* Veiculos circulando nos corredores */}
         {!reduced &&
           CORREDORES.map(([a, b], i) => (
-            <circle key={`v${i}`} r="3.2" fill="#9eff00" filter="url(#glow)">
-              <animateMotion
-                dur={`${5 + i}s`}
-                repeatCount="indefinite"
-                path={`M ${NOS[a].x} ${NOS[a].y} L ${NOS[b].x} ${NOS[b].y}`}
-              />
+            <circle key={`v${i}`} r="3" fill="#9eff00" filter="url(#glow)">
+              <animateMotion dur={`${4.5 + i * 0.7}s`} repeatCount="indefinite" path={`M ${NOS[a].x} ${NOS[a].y} L ${NOS[b].x} ${NOS[b].y}`} />
             </circle>
           ))}
 
@@ -126,17 +133,20 @@ export function Corridor() {
         {NOS.map((n, i) => (
           <g key={`n${i}`}>
             {n.hub && (
-              <circle cx={n.x} cy={n.y} r="13" fill="#9eff00" opacity="0.12">
+              <>
+                <circle cx={n.x} cy={n.y} r="13" fill="#9eff00" opacity="0.1">
+                  {!reduced && <animate attributeName="r" values="11;18;11" dur="2.8s" repeatCount="indefinite" />}
+                </circle>
                 {!reduced && (
-                  <animate attributeName="r" values="11;17;11" dur="2.8s" repeatCount="indefinite" />
+                  <circle cx={n.x} cy={n.y} r="9" fill="none" stroke="#9eff00" strokeWidth="1" opacity="0.5">
+                    <animate attributeName="r" values="8;26;8" dur="2.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.5;0;0.5" dur="2.8s" repeatCount="indefinite" />
+                  </circle>
                 )}
-              </circle>
+              </>
             )}
-            <circle
-              cx={n.x} cy={n.y} r={n.hub ? 7 : 4}
-              fill="#0a0c0a" stroke="#9eff00" strokeWidth={n.hub ? 2.5 : 1.6}
-            />
-            <circle cx={n.x} cy={n.y} r={n.hub ? 3 : 1.8} fill="#9eff00" />
+            <circle cx={n.x} cy={n.y} r={n.hub ? 7 : 3.6} fill="#0a0c0a" stroke="#9eff00" strokeWidth={n.hub ? 2.5 : 1.5} />
+            <circle cx={n.x} cy={n.y} r={n.hub ? 3 : 1.6} fill="#9eff00" />
             {n.nome && (
               <text
                 x={n.x} y={n.y - 12}
@@ -152,16 +162,16 @@ export function Corridor() {
         ))}
 
         {/* Rotulos dos estados */}
-        <text x="120" y="445" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="2">MS</text>
-        <text x="148" y="445" className="fill-muted-foreground font-mono" fontSize="9.5">· todas as cidades</text>
-        <text x="700" y="445" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="2">SP</text>
-        <text x="728" y="445" className="fill-muted-foreground font-mono" fontSize="9.5">· todas as cidades</text>
+        <text x="120" y="448" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="2">MS</text>
+        <text x="148" y="448" className="fill-muted-foreground font-mono" fontSize="9.5">· todas as cidades</text>
+        <text x="700" y="448" className="fill-trajetto font-mono" fontSize="13" fontWeight="700" letterSpacing="2">SP</text>
+        <text x="728" y="448" className="fill-muted-foreground font-mono" fontSize="9.5">· todas as cidades</text>
       </svg>
     </div>
   );
 }
 
-/** Letreiro rolante com cidades de MS e SP — reforça "todas as cidades". */
+/** Letreiro rolante com cidades de MS e SP. */
 const CIDADES = [
   "Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã",
   "Naviraí", "Aquidauana", "Nova Andradina", "Paranaíba", "Coxim",
