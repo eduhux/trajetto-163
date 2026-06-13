@@ -46,21 +46,26 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ erro: "Alvo inválido." }, { status: 400 });
     }
 
-    const [userSnap, motoSnap, avalSnap] = await Promise.all([
+    const [userSnap, motoSnap, avalMotoSnap, avalCliSnap] = await Promise.all([
       db.collection(COLLECTIONS.users).doc(alvoUid).get(),
       db.collection(COLLECTIONS.motoristas).doc(alvoUid).get(),
       db.collection(COLLECTIONS.avaliacoes).where("motoristaUid", "==", alvoUid).get(),
+      db.collection(COLLECTIONS.avaliacoesCliente).where("clienteUid", "==", alvoUid).get(),
     ]);
 
     const u = userSnap.exists ? userSnap.data()! : null;
     const m = motoSnap.exists ? motoSnap.data()! : null;
+    const ehCarreteiro = !!m;
 
-    const avaliacoes = avalSnap.docs
+    // Lista de avaliacoes relevante ao tipo do alvo, com autor unificado.
+    const avaliacoes = (ehCarreteiro ? avalMotoSnap.docs : avalCliSnap.docs)
       .map((d) => {
         const a = d.data();
         return {
           id: d.id,
-          clienteNome: a.clienteNome ?? "Cliente",
+          autorNome: ehCarreteiro
+            ? (a.clienteNome ?? "Cliente")
+            : (a.avaliadorNome ?? "Carreteiro"),
           nota: a.nota ?? 0,
           comentario: a.comentario ?? null,
           criadoEm: ms(a.criadoEm),
@@ -68,8 +73,17 @@ export async function GET(req: NextRequest) {
       })
       .sort((a, b) => b.criadoEm - a.criadoEm);
 
+    const notaMedia = ehCarreteiro
+      ? (m!.avaliacaoMedia ?? 0)
+      : (u?.avaliacaoMediaCliente ?? 0);
+    const totalAvaliacoes = ehCarreteiro
+      ? (m!.totalAvaliacoes ?? 0)
+      : (u?.totalAvaliacoesCliente ?? 0);
+
     return NextResponse.json({
-      ehCarreteiro: !!m,
+      ehCarreteiro,
+      notaMedia,
+      totalAvaliacoes,
       user: u
         ? {
             nomeCompleto: u.nomeCompleto ?? "Usuário",
@@ -86,8 +100,6 @@ export async function GET(req: NextRequest) {
             capacidadeCargaKg: m.capacidadeCargaKg ?? 0,
             cnhCategoria: m.cnhCategoria ?? "",
             rotasPreferidas: m.rotasPreferidas ?? [],
-            avaliacaoMedia: m.avaliacaoMedia ?? 0,
-            totalAvaliacoes: m.totalAvaliacoes ?? 0,
             totalFretesRealizados: m.totalFretesRealizados ?? 0,
           }
         : null,

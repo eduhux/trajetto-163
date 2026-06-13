@@ -67,6 +67,8 @@ export function ReputacaoDialog({
   const moto = dados?.motorista ?? null;
   const ehCarreteiro = !!moto;
   const avaliacoes = dados?.avaliacoes ?? [];
+  const notaMedia = dados?.notaMedia ?? 0;
+  const totalAvaliacoes = dados?.totalAvaliacoes ?? 0;
   const inicial = nome.charAt(0).toUpperCase();
 
   return (
@@ -115,14 +117,15 @@ export function ReputacaoDialog({
             {/* Estatisticas */}
             {ehCarreteiro ? (
               <div className="grid grid-cols-3 gap-3">
-                <Estatistica destaque valor={moto!.avaliacaoMedia > 0 ? moto!.avaliacaoMedia.toFixed(1) : "—"} label="nota média" />
-                <Estatistica valor={moto!.totalAvaliacoes} label="avaliações" />
+                <Estatistica destaque valor={notaMedia > 0 ? notaMedia.toFixed(1) : "—"} label="nota média" />
+                <Estatistica valor={totalAvaliacoes} label="avaliações" />
                 <Estatistica valor={moto!.totalFretesRealizados} label="fretes feitos" />
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
+                <Estatistica destaque valor={notaMedia > 0 ? notaMedia.toFixed(1) : "—"} label="nota média" />
+                <Estatistica valor={totalAvaliacoes} label="avaliações" />
                 <Estatistica valor={user.totalFretesPublicados} label="fretes publicados" />
-                <Estatistica valor={anoDe(user.criadoEm)} label="cliente desde" />
               </div>
             )}
 
@@ -172,7 +175,7 @@ export function ReputacaoDialog({
                   {avaliacoes.map((a) => (
                     <div key={a.id} className="rounded-xl bg-background/30 p-4 ring-1 ring-inset ring-border">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-medium">{a.clienteNome}</p>
+                        <p className="text-sm font-medium">{a.autorNome}</p>
                         <Estrelas valor={a.nota} tamanho="size-3.5" />
                       </div>
                       {a.comentario && <p className="mt-1.5 text-sm text-muted-foreground">{a.comentario}</p>}

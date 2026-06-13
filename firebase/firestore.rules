@@ -53,7 +53,9 @@ service cloud.firestore {
         && request.resource.data.plano == resource.data.plano
         && request.resource.data.admin == resource.data.admin
         && request.resource.data.suspenso == resource.data.suspenso
-        && request.resource.data.totalFretesPublicados == resource.data.totalFretesPublicados;
+        && request.resource.data.totalFretesPublicados == resource.data.totalFretesPublicados
+        && request.resource.data.get('avaliacaoMediaCliente', 0) == resource.data.get('avaliacaoMediaCliente', 0)
+        && request.resource.data.get('totalAvaliacoesCliente', 0) == resource.data.get('totalAvaliacoesCliente', 0);
 
       allow update, delete: if isAdmin();
     }
@@ -164,6 +166,12 @@ service cloud.firestore {
         && request.resource.data.nota >= 1
         && request.resource.data.nota <= 5;
       allow update, delete: if isAdmin();
+    }
+
+    match /avaliacoes_cliente/{id} {
+      // Avaliacao do cliente (feita pelo carreteiro). Leitura/escrita apenas
+      // via servidor (Admin); a reputacao e servida pela API /api/reputacao.
+      allow read, write: if isAdmin();
     }
 
     // ---------------------------------------------------------------

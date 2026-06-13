@@ -34,6 +34,9 @@ export interface UserDoc extends BaseDocument {
 
   // Metricas denormalizadas (cliente)
   totalFretesPublicados: number;
+  // Reputacao do cliente (avaliacoes feitas por carreteiros). Agregadas no servidor.
+  avaliacaoMediaCliente?: number;
+  totalAvaliacoesCliente?: number;
 }
 
 /**

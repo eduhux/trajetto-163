@@ -62,6 +62,30 @@ export async function marcarConcluido(freteId: string): Promise<void> {
   });
 }
 
+/** Carreteiro avalia o cliente de um frete que realizou (via servidor). */
+export async function avaliarCliente(params: {
+  freteId: string;
+  nota: number;
+  comentario: string;
+}): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Você precisa estar logado.");
+
+  const idToken = await user.getIdToken();
+  const res = await fetch("/api/avaliacao-cliente", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  const data = (await res.json()) as { ok?: boolean; erro?: string };
+  if (!res.ok || !data.ok) {
+    throw new Error(data.erro ?? "Não foi possível enviar a avaliação.");
+  }
+}
+
 /** Busca a avaliacao de um frete (se existir). */
 export async function buscarAvaliacao(
   freteId: string,

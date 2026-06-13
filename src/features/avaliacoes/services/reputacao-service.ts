@@ -6,6 +6,8 @@ import type { TipoVeiculo } from "@/types";
 /** Reputação retornada pelo servidor (já serializada, datas em ms). */
 export interface ReputacaoPayload {
   ehCarreteiro: boolean;
+  notaMedia: number;
+  totalAvaliacoes: number;
   user: {
     nomeCompleto: string;
     cidade: string;
@@ -19,13 +21,11 @@ export interface ReputacaoPayload {
     capacidadeCargaKg: number;
     cnhCategoria: string;
     rotasPreferidas: string[];
-    avaliacaoMedia: number;
-    totalAvaliacoes: number;
     totalFretesRealizados: number;
   } | null;
   avaliacoes: {
     id: string;
-    clienteNome: string;
+    autorNome: string;
     nota: number;
     comentario: string | null;
     criadoEm: number;

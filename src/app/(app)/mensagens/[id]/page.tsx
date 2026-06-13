@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Paperclip, SendHorizonal, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Paperclip, SendHorizonal, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -10,6 +10,8 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { MensagemBolha } from "@/features/chat/components/mensagem-bolha";
 import { Estrelas } from "@/components/shared/estrelas";
 import { ReputacaoDialog } from "@/features/avaliacoes/components/reputacao-dialog";
+import { AvaliarClienteDialog } from "@/features/avaliacoes/components/avaliar-cliente-dialog";
+import { buscarFrete } from "@/features/fretes/services/frete-service";
 import {
   buscarReputacao,
   type ReputacaoPayload,
@@ -23,7 +25,7 @@ import {
   marcarLidas,
   uploadAnexo,
 } from "@/features/chat/services/chat-service";
-import type { ConversaDoc, MensagemDoc } from "@/types";
+import type { ConversaDoc, MensagemDoc, FreteDoc } from "@/types";
 
 export default function ConversaPage() {
   const router = useRouter();
@@ -40,6 +42,9 @@ export default function ConversaPage() {
   const [reputacao, setReputacao] = useState<ReputacaoPayload | null>(null);
   const [repCarregando, setRepCarregando] = useState(true);
   const [reputacaoAberta, setReputacaoAberta] = useState(false);
+  const [frete, setFrete] = useState<FreteDoc | null>(null);
+  const [avaliarAberto, setAvaliarAberto] = useState(false);
+  const [clienteAvaliadoLocal, setClienteAvaliadoLocal] = useState(false);
   const [enviandoAnexo, setEnviandoAnexo] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
   const arquivoRef = useRef<HTMLInputElement>(null);
@@ -74,6 +79,14 @@ export default function ConversaPage() {
       .finally(() => setRepCarregando(false));
   }, [conversa, conversaId]);
 
+  // Carrega o frete da conversa (para o carreteiro poder avaliar o cliente).
+  useEffect(() => {
+    if (!conversa?.freteId) return;
+    buscarFrete(conversa.freteId)
+      .then(setFrete)
+      .catch(() => setFrete(null));
+  }, [conversa]);
+
   // Rolagem automatica ao chegar mensagem nova.
   useEffect(() => {
     fimRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -94,6 +107,13 @@ export default function ConversaPage() {
 
   const outroUid = conversa.participantes.find((p) => p !== perfil.uid) ?? "";
   const nomeOutro = conversa.metaParticipantes?.[outroUid]?.nome ?? "Usuário";
+
+  const podeAvaliarCliente =
+    !!frete &&
+    frete.status === "finalizado" &&
+    frete.motoristaUid === perfil.uid &&
+    !frete.clienteAvaliado &&
+    !clienteAvaliadoLocal;
 
   async function enviar() {
     const limpo = texto.trim();
@@ -160,14 +180,14 @@ export default function ConversaPage() {
                 Ver reputação {reputacao?.ehCarreteiro ? "do carreteiro" : "do cliente"}
               </span>
               <span className="block text-xs text-muted-foreground">
-                {reputacao?.motorista && reputacao.motorista.totalAvaliacoes > 0
-                  ? `${reputacao.motorista.avaliacaoMedia.toFixed(1)} · ${reputacao.motorista.totalAvaliacoes} ${reputacao.motorista.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}`
+                {reputacao && reputacao.totalAvaliacoes > 0
+                  ? `${reputacao.notaMedia.toFixed(1)} · ${reputacao.totalAvaliacoes} ${reputacao.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}`
                   : "Histórico e avaliações antes de fechar"}
               </span>
             </span>
           </span>
-          {reputacao?.motorista && reputacao.motorista.totalAvaliacoes > 0 ? (
-            <Estrelas valor={reputacao.motorista.avaliacaoMedia} tamanho="size-3.5" />
+          {reputacao && reputacao.totalAvaliacoes > 0 ? (
+            <Estrelas valor={reputacao.notaMedia} tamanho="size-3.5" />
           ) : (
             <span className="shrink-0 text-xs font-medium text-trajetto">Ver →</span>
           )}
@@ -181,6 +201,35 @@ export default function ConversaPage() {
         open={reputacaoAberta}
         onOpenChange={setReputacaoAberta}
       />
+
+      {podeAvaliarCliente && (
+        <div className="container max-w-2xl pt-3">
+          <div className="surface flex items-center justify-between gap-3 rounded-2xl p-4">
+            <span className="flex items-center gap-3">
+              <Star className="size-5 shrink-0 text-rodovia-400" />
+              <span>
+                <span className="block text-sm font-medium">Avaliar este cliente</span>
+                <span className="block text-xs text-muted-foreground">
+                  Frete concluído — conte como foi atender {nomeOutro}.
+                </span>
+              </span>
+            </span>
+            <Button variant="primary" size="sm" onClick={() => setAvaliarAberto(true)}>
+              Avaliar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {frete && (
+        <AvaliarClienteDialog
+          freteId={frete.id}
+          clienteNome={nomeOutro}
+          open={avaliarAberto}
+          onOpenChange={setAvaliarAberto}
+          onAvaliado={() => setClienteAvaliadoLocal(true)}
+        />
+      )}
 
       <div className="flex-1 overflow-y-auto">
         <div className="container flex max-w-2xl flex-col gap-2 py-4">

@@ -3,6 +3,8 @@
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -110,4 +112,10 @@ export async function listarFretesAtivos(): Promise<FreteDoc[]> {
   );
   const fretes = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as FreteDoc);
   return ordenar(fretes);
+}
+
+/** Busca um frete pelo id (anuncios sao de leitura publica). */
+export async function buscarFrete(freteId: string): Promise<FreteDoc | null> {
+  const snap = await getDoc(doc(db, COLLECTIONS.fretes, freteId));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as FreteDoc) : null;
 }

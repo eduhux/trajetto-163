@@ -7,6 +7,7 @@ export const COLLECTIONS = {
   conversas: "conversas",
   mensagens: "mensagens", // subcollection de conversas/{id}/mensagens
   avaliacoes: "avaliacoes",
+  avaliacoesCliente: "avaliacoes_cliente",
   notificacoes: "notificacoes",
   banners: "banners",
   configuracoes: "configuracoes",
