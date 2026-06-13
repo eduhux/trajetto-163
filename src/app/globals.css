@@ -108,6 +108,24 @@
   h1, h2, h3, .font-display {
     font-feature-settings: "ss01" 1;
   }
+
+  /* Campos de data/hora: o icone do seletor (calendario/relogio) vem preto
+     por padrao e some no fundo escuro. Clareamos para ficar visivel. */
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.1);
+    opacity: 0.65;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
 }
 
 @layer components {
