@@ -9,8 +9,11 @@ import { TelaCarregando } from "@/components/shared/loading";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { MensagemBolha } from "@/features/chat/components/mensagem-bolha";
 import { Estrelas } from "@/components/shared/estrelas";
-import { buscarMotorista } from "@/features/auth/services/auth-service";
 import { ReputacaoDialog } from "@/features/avaliacoes/components/reputacao-dialog";
+import {
+  buscarReputacao,
+  type ReputacaoPayload,
+} from "@/features/avaliacoes/services/reputacao-service";
 import { AVISO_CONTATO, contemContato } from "@/lib/moderacao/contato";
 import {
   buscarConversa,
@@ -20,7 +23,7 @@ import {
   marcarLidas,
   uploadAnexo,
 } from "@/features/chat/services/chat-service";
-import type { ConversaDoc, MensagemDoc, MotoristaDoc } from "@/types";
+import type { ConversaDoc, MensagemDoc } from "@/types";
 
 export default function ConversaPage() {
   const router = useRouter();
@@ -34,7 +37,8 @@ export default function ConversaPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
-  const [motoristaOutro, setMotoristaOutro] = useState<MotoristaDoc | null>(null);
+  const [reputacao, setReputacao] = useState<ReputacaoPayload | null>(null);
+  const [repCarregando, setRepCarregando] = useState(true);
   const [reputacaoAberta, setReputacaoAberta] = useState(false);
   const [enviandoAnexo, setEnviandoAnexo] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
@@ -60,15 +64,15 @@ export default function ConversaPage() {
     return () => unsub();
   }, [conversa, conversaId]);
 
-  // Reputacao do outro participante (se for motorista).
+  // Reputacao do outro participante — vem do servidor protegido.
   useEffect(() => {
-    if (!conversa || !perfil) return;
-    const outro = conversa.participantes.find((p) => p !== perfil.uid);
-    if (!outro) return;
-    buscarMotorista(outro)
-      .then(setMotoristaOutro)
-      .catch(() => setMotoristaOutro(null));
-  }, [conversa, perfil]);
+    if (!conversa) return;
+    setRepCarregando(true);
+    buscarReputacao(conversaId)
+      .then(setReputacao)
+      .catch(() => setReputacao(null))
+      .finally(() => setRepCarregando(false));
+  }, [conversa, conversaId]);
 
   // Rolagem automatica ao chegar mensagem nova.
   useEffect(() => {
@@ -153,17 +157,17 @@ export default function ConversaPage() {
             <ShieldCheck className="size-5 shrink-0 text-trajetto" />
             <span>
               <span className="block text-sm font-medium">
-                Ver reputação {motoristaOutro ? "do carreteiro" : "do cliente"}
+                Ver reputação {reputacao?.ehCarreteiro ? "do carreteiro" : "do cliente"}
               </span>
               <span className="block text-xs text-muted-foreground">
-                {motoristaOutro && motoristaOutro.totalAvaliacoes > 0
-                  ? `${motoristaOutro.avaliacaoMedia.toFixed(1)} · ${motoristaOutro.totalAvaliacoes} ${motoristaOutro.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}`
+                {reputacao?.motorista && reputacao.motorista.totalAvaliacoes > 0
+                  ? `${reputacao.motorista.avaliacaoMedia.toFixed(1)} · ${reputacao.motorista.totalAvaliacoes} ${reputacao.motorista.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}`
                   : "Histórico e avaliações antes de fechar"}
               </span>
             </span>
           </span>
-          {motoristaOutro && motoristaOutro.totalAvaliacoes > 0 ? (
-            <Estrelas valor={motoristaOutro.avaliacaoMedia} tamanho="size-3.5" />
+          {reputacao?.motorista && reputacao.motorista.totalAvaliacoes > 0 ? (
+            <Estrelas valor={reputacao.motorista.avaliacaoMedia} tamanho="size-3.5" />
           ) : (
             <span className="shrink-0 text-xs font-medium text-trajetto">Ver →</span>
           )}
@@ -171,8 +175,9 @@ export default function ConversaPage() {
       </div>
 
       <ReputacaoDialog
-        uid={outroUid}
+        dados={reputacao}
         nome={nomeOutro}
+        carregando={repCarregando}
         open={reputacaoAberta}
         onOpenChange={setReputacaoAberta}
       />

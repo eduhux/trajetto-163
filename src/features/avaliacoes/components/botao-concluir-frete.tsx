@@ -44,7 +44,7 @@ export function BotaoConcluirFrete({
     setComentario("");
     setCarregando(true);
     try {
-      const lista = await buscarCandidatosMotorista(frete.id, frete.clienteUid);
+      const lista = await buscarCandidatosMotorista(frete.id);
       setCandidatos(lista);
     } catch {
       setCandidatos([]);

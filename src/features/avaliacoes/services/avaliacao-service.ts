@@ -3,8 +3,6 @@
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
-import { buscarConversasDoFrete } from "@/features/chat/services/chat-service";
-import { buscarMotorista } from "@/features/auth/services/auth-service";
 import type { AvaliacaoDoc } from "@/types";
 
 export interface CandidatoMotorista {
@@ -15,30 +13,20 @@ export interface CandidatoMotorista {
   totalAvaliacoes: number;
 }
 
-/** Lista os usuarios que conversaram sobre o frete (candidatos a serem avaliados). */
+/** Lista os usuarios que conversaram sobre o frete (via servidor protegido). */
 export async function buscarCandidatosMotorista(
   freteId: string,
-  clienteUid: string,
 ): Promise<CandidatoMotorista[]> {
-  const conversas = await buscarConversasDoFrete(freteId, clienteUid);
-  const vistos = new Set<string>();
-  const candidatos: CandidatoMotorista[] = [];
+  const user = auth.currentUser;
+  if (!user) throw new Error("Você precisa estar logado.");
 
-  for (const c of conversas) {
-    const outroUid = c.participantes.find((p) => p !== clienteUid);
-    if (!outroUid || vistos.has(outroUid)) continue;
-    vistos.add(outroUid);
-
-    const m = await buscarMotorista(outroUid);
-    candidatos.push({
-      uid: outroUid,
-      nome: c.metaParticipantes?.[outroUid]?.nome ?? "Usuário",
-      ehMotorista: !!m,
-      avaliacaoMedia: m?.avaliacaoMedia ?? 0,
-      totalAvaliacoes: m?.totalAvaliacoes ?? 0,
-    });
-  }
-  return candidatos;
+  const idToken = await user.getIdToken();
+  const res = await fetch(`/api/candidatos?freteId=${encodeURIComponent(freteId)}`, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error("Não foi possível carregar os candidatos.");
+  const data = (await res.json()) as { candidatos?: CandidatoMotorista[] };
+  return data.candidatos ?? [];
 }
 
 /** Conclui o frete e registra a avaliacao do motorista (via servidor). */

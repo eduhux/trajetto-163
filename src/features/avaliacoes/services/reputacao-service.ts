@@ -1,48 +1,53 @@
 "use client";
 
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  Timestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
-import { COLLECTIONS } from "@/lib/firebase/collections";
-import { buscarPerfil, buscarMotorista } from "@/features/auth/services/auth-service";
-import type { AvaliacaoDoc, MotoristaDoc, UserDoc } from "@/types";
+import { auth } from "@/lib/firebase/client";
+import type { TipoVeiculo } from "@/types";
 
-export interface PerfilPublico {
-  user: UserDoc | null;
-  motorista: MotoristaDoc | null;
+/** Reputação retornada pelo servidor (já serializada, datas em ms). */
+export interface ReputacaoPayload {
+  ehCarreteiro: boolean;
+  user: {
+    nomeCompleto: string;
+    cidade: string;
+    estado: string;
+    fotoPerfilUrl: string | null;
+    criadoEm: number;
+    totalFretesPublicados: number;
+  } | null;
+  motorista: {
+    tipoVeiculo: TipoVeiculo;
+    capacidadeCargaKg: number;
+    cnhCategoria: string;
+    rotasPreferidas: string[];
+    avaliacaoMedia: number;
+    totalAvaliacoes: number;
+    totalFretesRealizados: number;
+  } | null;
+  avaliacoes: {
+    id: string;
+    clienteNome: string;
+    nota: number;
+    comentario: string | null;
+    criadoEm: number;
+  }[];
 }
 
-/** Busca o perfil publico (usuario + ficha de motorista, se houver). */
-export async function buscarPerfilPublico(uid: string): Promise<PerfilPublico> {
-  const [user, motorista] = await Promise.all([
-    buscarPerfil(uid),
-    buscarMotorista(uid),
-  ]);
-  return { user, motorista };
-}
+/**
+ * Busca a reputação do OUTRO participante de uma conversa.
+ * Os dados vêm do servidor, que confere se você participa da conversa —
+ * o cliente nunca lê esses dados direto do banco.
+ */
+export async function buscarReputacao(
+  conversaId: string,
+): Promise<ReputacaoPayload> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Você precisa estar logado.");
 
-function millis(v: AvaliacaoDoc["criadoEm"]): number {
-  if (v instanceof Timestamp) return v.toMillis();
-  if (typeof v === "number") return v;
-  return 0;
-}
-
-/** Lista as avaliacoes recebidas por um motorista, mais recentes primeiro. */
-export async function listarAvaliacoesDoMotorista(
-  uid: string,
-): Promise<AvaliacaoDoc[]> {
-  // Consulta de campo unico (sem indice composto); ordenacao no cliente.
-  const q = query(
-    collection(db, COLLECTIONS.avaliacoes),
-    where("motoristaUid", "==", uid),
+  const idToken = await user.getIdToken();
+  const res = await fetch(
+    `/api/reputacao?conversaId=${encodeURIComponent(conversaId)}`,
+    { headers: { Authorization: `Bearer ${idToken}` } },
   );
-  const snap = await getDocs(q);
-  const lista = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as AvaliacaoDoc);
-  lista.sort((a, b) => millis(b.criadoEm) - millis(a.criadoEm));
-  return lista;
+  if (!res.ok) throw new Error("Não foi possível carregar a reputação.");
+  return (await res.json()) as ReputacaoPayload;
 }

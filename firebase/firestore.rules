@@ -34,9 +34,10 @@ service cloud.firestore {
     // users
     // ---------------------------------------------------------------
     match /users/{uid} {
-      // Perfis sao publicos para leitura (necessario p/ exibir autor de frete,
-      // participantes de chat etc.). Dados sensiveis nao ficam aqui.
-      allow read: if true;
+      // Leitura restrita: cada um le o proprio perfil. Dados de outros usuarios
+      // (nome do autor de frete, participantes de chat) ja ficam denormalizados
+      // nos proprios documentos de frete/conversa. Reputacao vem por API protegida.
+      allow read: if isSelf(uid) || isAdmin();
 
       // Cria apenas o proprio documento, com plano forcado a gratuito e sem admin.
       allow create: if isSelf(uid)
@@ -61,7 +62,9 @@ service cloud.firestore {
     // motoristas
     // ---------------------------------------------------------------
     match /motoristas/{uid} {
-      allow read: if true;
+      // Leitura restrita ao dono/admin. A reputacao do outro participante de
+      // uma conversa e servida pela API protegida /api/reputacao.
+      allow read: if isSelf(uid) || isAdmin();
 
       allow create: if isSelf(uid)
         && request.resource.data.uid == uid
@@ -150,7 +153,12 @@ service cloud.firestore {
     // avaliacoes (cliente cria; backend recalcula media)
     // ---------------------------------------------------------------
     match /avaliacoes/{id} {
-      allow read: if true;
+      // Leitura apenas pelas partes da avaliacao (cliente ou motorista) ou admin.
+      // A listagem de reputacao de terceiros e feita pelo servidor (Admin).
+      allow read: if isAdmin()
+        || (isSignedIn()
+            && (resource.data.clienteUid == request.auth.uid
+                || resource.data.motoristaUid == request.auth.uid));
       allow create: if isSignedIn()
         && request.resource.data.clienteUid == request.auth.uid
         && request.resource.data.nota >= 1

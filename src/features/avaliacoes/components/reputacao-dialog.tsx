@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Timestamp } from "firebase/firestore";
 import {
   Truck,
   Package,
@@ -16,12 +14,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Estrelas } from "@/components/shared/estrelas";
 import { formatDateBR } from "@/lib/utils";
-import {
-  buscarPerfilPublico,
-  listarAvaliacoesDoMotorista,
-  type PerfilPublico,
-} from "../services/reputacao-service";
-import type { AvaliacaoDoc, TipoVeiculo } from "@/types";
+import type { ReputacaoPayload } from "../services/reputacao-service";
+import type { TipoVeiculo } from "@/types";
 
 const VEICULO_LABEL: Record<TipoVeiculo, string> = {
   moto: "Moto",
@@ -34,19 +28,19 @@ const VEICULO_LABEL: Record<TipoVeiculo, string> = {
   carreta: "Carreta",
 };
 
-function anoDe(v: unknown): string {
-  if (v instanceof Timestamp) return String(v.toDate().getFullYear());
-  if (typeof v === "number") return String(new Date(v).getFullYear());
-  return "—";
+function anoDe(ms: number): string {
+  return ms > 0 ? String(new Date(ms).getFullYear()) : "—";
 }
 
-function dataDe(v: AvaliacaoDoc["criadoEm"]): string {
-  if (v instanceof Timestamp) return formatDateBR(v.toMillis());
-  if (typeof v === "number") return formatDateBR(v);
-  return "";
-}
-
-function Estatistica({ valor, label, destaque }: { valor: string | number; label: string; destaque?: boolean }) {
+function Estatistica({
+  valor,
+  label,
+  destaque,
+}: {
+  valor: string | number;
+  label: string;
+  destaque?: boolean;
+}) {
   return (
     <div className="rounded-xl bg-background/40 p-4 text-center ring-1 ring-inset ring-border">
       <p className={`font-display text-2xl font-bold ${destaque ? "text-trajetto" : ""}`}>{valor}</p>
@@ -55,37 +49,24 @@ function Estatistica({ valor, label, destaque }: { valor: string | number; label
   );
 }
 
-/** Painel privado de reputação do outro participante da conversa. */
+/** Painel privado de reputação — recebe os dados já carregados pelo chat. */
 export function ReputacaoDialog({
-  uid,
+  dados,
   nome,
+  carregando,
   open,
   onOpenChange,
 }: {
-  uid: string;
+  dados: ReputacaoPayload | null;
   nome: string;
+  carregando: boolean;
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const [perfil, setPerfil] = useState<PerfilPublico | null>(null);
-  const [avaliacoes, setAvaliacoes] = useState<AvaliacaoDoc[]>([]);
-  const [carregando, setCarregando] = useState(false);
-
-  useEffect(() => {
-    if (!open || !uid) return;
-    setCarregando(true);
-    Promise.all([buscarPerfilPublico(uid), listarAvaliacoesDoMotorista(uid)])
-      .then(([p, a]) => {
-        setPerfil(p);
-        setAvaliacoes(a);
-      })
-      .catch(() => setPerfil({ user: null, motorista: null }))
-      .finally(() => setCarregando(false));
-  }, [open, uid]);
-
-  const user = perfil?.user ?? null;
-  const moto = perfil?.motorista ?? null;
+  const user = dados?.user ?? null;
+  const moto = dados?.motorista ?? null;
   const ehCarreteiro = !!moto;
+  const avaliacoes = dados?.avaliacoes ?? [];
   const inicial = nome.charAt(0).toUpperCase();
 
   return (
@@ -196,7 +177,7 @@ export function ReputacaoDialog({
                       </div>
                       {a.comentario && <p className="mt-1.5 text-sm text-muted-foreground">{a.comentario}</p>}
                       <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground/60">
-                        {dataDe(a.criadoEm)}
+                        {a.criadoEm > 0 ? formatDateBR(a.criadoEm) : ""}
                       </p>
                     </div>
                   ))}
