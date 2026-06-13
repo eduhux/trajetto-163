@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PlusCircle, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -14,7 +15,13 @@ import type { FreteDoc } from "@/types";
 
 export default function MeusFretesPage() {
   const { perfil } = useAuth();
+  const router = useRouter();
   const [fretes, setFretes] = useState<FreteDoc[] | null>(null);
+
+  // Carreteiro não publica fretes — leva para "Fretes realizados".
+  useEffect(() => {
+    if (perfil?.tipoConta === "motorista") router.replace("/realizados");
+  }, [perfil, router]);
 
   function carregar() {
     if (!perfil) return;

@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Boxes,
   MessageSquare,
+  PackageCheck,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
@@ -18,19 +19,27 @@ import { useTotalNaoLidas } from "@/features/chat/hooks/use-total-nao-lidas";
 import { useUIStore } from "@/stores";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/painel", label: "Painel", icon: LayoutDashboard },
-  { href: "/publicar", label: "Publicar frete", icon: PlusCircle },
-  { href: "/fretes", label: "Buscar fretes", icon: Search },
-  { href: "/meus-fretes", label: "Meus fretes", icon: Boxes },
-  { href: "/mensagens", label: "Mensagens", icon: MessageSquare },
-];
-
 export function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const naoLidas = useUIStore((s) => s.totalNaoLidasChat);
   const { perfil } = useAuth();
+
+  const ehMotorista = perfil?.tipoConta === "motorista";
+  const NAV = ehMotorista
+    ? [
+        { href: "/painel", label: "Painel", icon: LayoutDashboard },
+        { href: "/fretes", label: "Buscar fretes", icon: Search },
+        { href: "/realizados", label: "Fretes realizados", icon: PackageCheck },
+        { href: "/mensagens", label: "Mensagens", icon: MessageSquare },
+      ]
+    : [
+        { href: "/painel", label: "Painel", icon: LayoutDashboard },
+        { href: "/publicar", label: "Publicar frete", icon: PlusCircle },
+        { href: "/fretes", label: "Buscar fretes", icon: Search },
+        { href: "/meus-fretes", label: "Meus fretes", icon: Boxes },
+        { href: "/mensagens", label: "Mensagens", icon: MessageSquare },
+      ];
 
   // Mantem o contador global de mensagens nao lidas atualizado.
   useTotalNaoLidas();

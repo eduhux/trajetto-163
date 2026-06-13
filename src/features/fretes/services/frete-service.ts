@@ -114,6 +114,22 @@ export async function listarFretesAtivos(): Promise<FreteDoc[]> {
   return ordenar(fretes);
 }
 
+/** Lista os fretes que um carreteiro realizou (finalizados, ele como motorista). */
+export async function listarFretesRealizados(uid: string): Promise<FreteDoc[]> {
+  const snap = await getDocs(
+    query(collection(db, COLLECTIONS.fretes), where("motoristaUid", "==", uid)),
+  );
+  const fretes = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as FreteDoc)
+    .filter((f) => f.status === "finalizado");
+  fretes.sort((a, b) => {
+    const ma = (a.criadoEm as { toMillis?: () => number })?.toMillis?.() ?? 0;
+    const mb = (b.criadoEm as { toMillis?: () => number })?.toMillis?.() ?? 0;
+    return mb - ma;
+  });
+  return fretes;
+}
+
 /** Busca um frete pelo id (anuncios sao de leitura publica). */
 export async function buscarFrete(freteId: string): Promise<FreteDoc | null> {
   const snap = await getDoc(doc(db, COLLECTIONS.fretes, freteId));
