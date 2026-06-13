@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Paperclip, SendHorizonal } from "lucide-react";
+import { ArrowLeft, Loader2, Paperclip, SendHorizonal, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -10,6 +10,7 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { MensagemBolha } from "@/features/chat/components/mensagem-bolha";
 import { Estrelas } from "@/components/shared/estrelas";
 import { buscarMotorista } from "@/features/auth/services/auth-service";
+import { ReputacaoDialog } from "@/features/avaliacoes/components/reputacao-dialog";
 import { AVISO_CONTATO, contemContato } from "@/lib/moderacao/contato";
 import {
   buscarConversa,
@@ -34,6 +35,7 @@ export default function ConversaPage() {
   const [enviando, setEnviando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
   const [motoristaOutro, setMotoristaOutro] = useState<MotoristaDoc | null>(null);
+  const [reputacaoAberta, setReputacaoAberta] = useState(false);
   const [enviandoAnexo, setEnviandoAnexo] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
   const arquivoRef = useRef<HTMLInputElement>(null);
@@ -138,15 +140,42 @@ export default function ConversaPage() {
           {nomeOutro.charAt(0).toUpperCase()}
         </span>
         <p className="font-medium">{nomeOutro}</p>
-        {motoristaOutro && motoristaOutro.totalAvaliacoes > 0 && (
-          <Estrelas
-            valor={motoristaOutro.avaliacaoMedia}
-            total={motoristaOutro.totalAvaliacoes}
-            mostrarNumero
-            tamanho="size-3.5"
-          />
-        )}
       </div>
+
+      {/* Card privado de reputação — visível só para os dois da conversa */}
+      <div className="container max-w-2xl pt-3">
+        <button
+          type="button"
+          onClick={() => setReputacaoAberta(true)}
+          className="surface surface-hover flex w-full items-center justify-between gap-3 rounded-2xl p-4 text-left"
+        >
+          <span className="flex items-center gap-3">
+            <ShieldCheck className="size-5 shrink-0 text-trajetto" />
+            <span>
+              <span className="block text-sm font-medium">
+                Ver reputação {motoristaOutro ? "do carreteiro" : "do cliente"}
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                {motoristaOutro && motoristaOutro.totalAvaliacoes > 0
+                  ? `${motoristaOutro.avaliacaoMedia.toFixed(1)} · ${motoristaOutro.totalAvaliacoes} ${motoristaOutro.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}`
+                  : "Histórico e avaliações antes de fechar"}
+              </span>
+            </span>
+          </span>
+          {motoristaOutro && motoristaOutro.totalAvaliacoes > 0 ? (
+            <Estrelas valor={motoristaOutro.avaliacaoMedia} tamanho="size-3.5" />
+          ) : (
+            <span className="shrink-0 text-xs font-medium text-trajetto">Ver →</span>
+          )}
+        </button>
+      </div>
+
+      <ReputacaoDialog
+        uid={outroUid}
+        nome={nomeOutro}
+        open={reputacaoAberta}
+        onOpenChange={setReputacaoAberta}
+      />
 
       <div className="flex-1 overflow-y-auto">
         <div className="container flex max-w-2xl flex-col gap-2 py-4">
