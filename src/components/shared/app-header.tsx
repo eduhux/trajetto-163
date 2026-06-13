@@ -13,6 +13,7 @@ import {
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { sair } from "@/features/auth/services/auth-service";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTotalNaoLidas } from "@/features/chat/hooks/use-total-nao-lidas";
 import { useUIStore } from "@/stores";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const naoLidas = useUIStore((s) => s.totalNaoLidasChat);
+  const { perfil } = useAuth();
 
   // Mantem o contador global de mensagens nao lidas atualizado.
   useTotalNaoLidas();
@@ -73,9 +75,30 @@ export function AppHeader() {
             })}
           </nav>
         </div>
-        <Button variant="outline" size="sm" onClick={deslogar}>
-          <LogOut className="size-4" /> Sair
-        </Button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/perfil"
+            aria-label="Meu perfil"
+            className={cn(
+              "flex size-9 items-center justify-center overflow-hidden rounded-full ring-1 transition-colors",
+              pathname.startsWith("/perfil")
+                ? "ring-trajetto"
+                : "ring-border hover:ring-trajetto/50",
+            )}
+          >
+            {perfil?.fotoPerfilUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={perfil.fotoPerfilUrl} alt="Meu perfil" className="size-full object-cover" />
+            ) : (
+              <span className="flex size-full items-center justify-center bg-trajetto/10 text-sm font-semibold text-trajetto">
+                {perfil?.nomeCompleto?.charAt(0).toUpperCase() ?? "?"}
+              </span>
+            )}
+          </Link>
+          <Button variant="outline" size="sm" onClick={deslogar}>
+            <LogOut className="size-4" /> Sair
+          </Button>
+        </div>
       </div>
 
       {/* Navegação mobile */}
