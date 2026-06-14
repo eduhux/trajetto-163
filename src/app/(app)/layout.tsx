@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { TelaCarregando } from "@/components/shared/loading";
 import { AppHeader } from "@/components/shared/app-header";
 import { UpgradeModal } from "@/features/fretes/components/upgrade-modal";
+import { NotificacoesChat } from "@/features/chat/components/notificacoes-chat";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
 /** Protege as rotas internas: exige login e cadastro completo. */
@@ -30,6 +31,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <AppHeader />
       {children}
       <UpgradeModal />
+      <NotificacoesChat />
     </div>
   );
 }
