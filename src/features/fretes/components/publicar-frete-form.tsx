@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Timestamp } from "firebase/firestore";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +14,43 @@ import { Field } from "@/components/ui/field";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useUIStore } from "@/stores";
 import { publicarFreteSchema, type PublicarFreteInput } from "@/lib/validations";
-import { publicarFrete } from "@/features/fretes/services/frete-service";
+import { publicarFrete, atualizarFrete } from "@/features/fretes/services/frete-service";
+import type { FreteDoc } from "@/types";
 
-export function PublicarFreteForm() {
+function paraInputDate(v: FreteDoc["dataColeta"]): string {
+  const ms = v instanceof Timestamp ? v.toMillis() : typeof v === "number" ? v : 0;
+  if (!ms) return "";
+  const d = new Date(ms);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
   const router = useRouter();
   const { perfil } = useAuth();
   const abrirModal = useUIStore((s) => s.abrirModal);
   const [erro, setErro] = useState<string | null>(null);
+
+  const ehEdicao = !!frete;
+
+  const valoresIniciais = (
+    frete
+      ? {
+          estadoOrigem: frete.estadoOrigem,
+          estadoDestino: frete.estadoDestino,
+          cidadeOrigem: frete.cidadeOrigem,
+          cidadeDestino: frete.cidadeDestino,
+          descricaoCarga: frete.descricaoCarga,
+          pesoKg: String(frete.pesoKg),
+          volumeM3: frete.volumeM3 != null ? String(frete.volumeM3) : "",
+          valorFrete: String(frete.valorFrete),
+          dataColeta: paraInputDate(frete.dataColeta),
+          observacoes: frete.observacoes ?? "",
+          urgencia: frete.urgencia,
+        }
+      : { urgencia: "normal" }
+  ) as unknown as DefaultValues<PublicarFreteInput>;
 
   const {
     register,
@@ -27,12 +58,23 @@ export function PublicarFreteForm() {
     formState: { errors, isSubmitting },
   } = useForm<PublicarFreteInput>({
     resolver: zodResolver(publicarFreteSchema),
-    defaultValues: { urgencia: "normal" },
+    defaultValues: valoresIniciais,
   });
 
   async function onSubmit(data: PublicarFreteInput) {
     if (!perfil) return;
     setErro(null);
+
+    if (frete) {
+      try {
+        await atualizarFrete(frete.id, data);
+        router.push("/meus-fretes");
+      } catch {
+        setErro("Não foi possível salvar as alterações. Tente novamente.");
+      }
+      return;
+    }
+
     const res = await publicarFrete(perfil, data);
     if (res.ok) {
       router.push("/meus-fretes");
@@ -114,12 +156,12 @@ export function PublicarFreteForm() {
       </div>
 
       <Field label="Observações" htmlFor="observacoes" hint="opcional" error={errors.observacoes?.message}>
-        <Textarea id="observacoes" placeholder="Algum detalhe importante para o motorista?" {...register("observacoes")} />
+        <Textarea id="observacoes" placeholder="Algum detalhe importante para o carreteiro?" {...register("observacoes")} />
       </Field>
 
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting && <Loader2 className="animate-spin" />}
-        Publicar frete
+        {ehEdicao ? "Salvar alterações" : "Publicar frete"}
       </Button>
     </form>
   );

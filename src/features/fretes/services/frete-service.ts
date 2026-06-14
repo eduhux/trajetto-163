@@ -9,6 +9,7 @@ import {
   query,
   serverTimestamp,
   Timestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -128,6 +129,35 @@ export async function listarFretesRealizados(uid: string): Promise<FreteDoc[]> {
     return mb - ma;
   });
   return fretes;
+}
+
+/** Atualiza os dados de um frete (somente o dono; regra do Firestore garante). */
+export async function atualizarFrete(
+  freteId: string,
+  input: PublicarFreteInput,
+): Promise<void> {
+  await updateDoc(doc(db, COLLECTIONS.fretes, freteId), {
+    estadoOrigem: input.estadoOrigem,
+    estadoDestino: input.estadoDestino,
+    cidadeOrigem: input.cidadeOrigem,
+    cidadeDestino: input.cidadeDestino,
+    descricaoCarga: input.descricaoCarga,
+    pesoKg: input.pesoKg,
+    volumeM3: input.volumeM3 ?? null,
+    valorFrete: input.valorFrete,
+    dataColeta: Timestamp.fromDate(new Date(input.dataColeta)),
+    observacoes: input.observacoes ?? null,
+    urgencia: input.urgencia,
+    atualizadoEm: serverTimestamp(),
+  });
+}
+
+/** Cancela um frete (tira do ar). Somente o dono. */
+export async function cancelarFrete(freteId: string): Promise<void> {
+  await updateDoc(doc(db, COLLECTIONS.fretes, freteId), {
+    status: "cancelado",
+    atualizadoEm: serverTimestamp(),
+  });
 }
 
 /** Busca um frete pelo id (anuncios sao de leitura publica). */
