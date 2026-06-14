@@ -35,7 +35,7 @@ function Trilha({
       : { chip: "bg-rodovia-400/10 text-rodovia-400", num: "text-rodovia-400" };
 
   return (
-    <div className="surface h-full rounded-2xl p-7">
+    <div className="surface surface-hover h-full rounded-2xl p-7">
       <div className="flex items-center gap-3">
         <span className={cn("inline-flex size-10 items-center justify-center rounded-xl", cores.chip)}>
           {icone}

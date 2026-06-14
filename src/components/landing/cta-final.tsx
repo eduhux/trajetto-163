@@ -6,7 +6,7 @@ export function CtaFinal() {
   return (
     <section className="py-20 md:py-28">
       <div className="container">
-        <Reveal className="surface grain relative mx-auto max-w-4xl overflow-hidden rounded-[1.75rem] px-8 py-14 text-center md:py-16">
+        <Reveal className="surface grain gradient-border relative mx-auto max-w-4xl overflow-hidden rounded-[1.75rem] px-8 py-14 text-center md:py-16">
           {/* brilhos: lime no topo, ambar embaixo */}
           <div
             aria-hidden

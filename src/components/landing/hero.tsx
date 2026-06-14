@@ -1,5 +1,6 @@
 "use client";
 
+import { type MouseEvent } from "react";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Package, Truck } from "lucide-react";
@@ -23,6 +24,12 @@ const fade: Variants = {
 };
 
 export function Hero() {
+  function spotlight(e: MouseEvent<HTMLDivElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+    e.currentTarget.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+  }
+
   return (
     <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
       <div className="container relative">
@@ -40,7 +47,7 @@ export function Hero() {
             className="mt-6 text-balance font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight md:text-7xl"
           >
             Carga pesada rodando entre{" "}
-            <span className="bg-gradient-to-r from-trajetto via-trajetto to-trajetto-200 bg-clip-text text-transparent">
+            <span className="animate-gradient bg-gradient-to-r from-trajetto via-[#34d399] to-trajetto bg-clip-text text-transparent">
               todas as cidades
             </span>{" "}
             de SP e MS.
@@ -78,22 +85,32 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.7, ease: "easeOut" }}
-          className="relative mx-auto mt-16 max-w-4xl"
+          className="group relative mx-auto mt-16 max-w-4xl"
         >
-          {/* brilho atras do painel */}
+          {/* brilho atras do painel — flutua suavemente */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -inset-x-10 -top-10 bottom-0 -z-10 rounded-[2rem] bg-trajetto/10 blur-[90px]"
+            className="animate-float pointer-events-none absolute -inset-x-10 -top-10 bottom-0 -z-10 rounded-[2rem] bg-trajetto/10 blur-[90px]"
           />
-          <div className="surface grain relative overflow-hidden rounded-3xl p-5 md:p-8">
-            <div className="mb-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <span className="inline-block size-1.5 animate-pulse rounded-full bg-trajetto" />
-                rede ao vivo
-              </span>
-              <span>BR-163 · corredor</span>
+          <div
+            onMouseMove={spotlight}
+            className="surface grain gradient-border relative overflow-hidden rounded-3xl p-5 md:p-8"
+          >
+            {/* spotlight que segue o cursor */}
+            <div
+              aria-hidden
+              className="spotlight pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
+            <div className="relative">
+              <div className="mb-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-1.5 animate-pulse rounded-full bg-trajetto" />
+                  rede ao vivo
+                </span>
+                <span>BR-163 · corredor</span>
+              </div>
+              <Corridor />
             </div>
-            <Corridor />
           </div>
         </motion.div>
       </div>
@@ -120,7 +137,7 @@ export function Hero() {
               key={s.label}
               variants={fade}
               custom={i + 4}
-              className="surface rounded-2xl px-6 py-6 text-center"
+              className="surface surface-hover rounded-2xl px-6 py-6 text-center"
             >
               <dt className={`font-display text-3xl font-bold ${s.cor}`}>
                 {s.valor}
