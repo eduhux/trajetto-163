@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
-import { Camera, Loader2, Trash2, Truck, Package, MapPin, Mail } from "lucide-react";
+import { Camera, Loader2, Trash2, Truck, Package, MapPin, Mail, Phone, Pencil } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useAuthStore } from "@/stores";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
+import { EditarPerfilDialog } from "@/features/auth/components/editar-perfil-dialog";
 import {
   uploadFotoPerfil,
   removerFotoPerfil,
@@ -17,6 +18,7 @@ export default function PerfilPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [editarAberto, setEditarAberto] = useState(false);
 
   if (!perfil) return <TelaCarregando texto="Carregando perfil..." />;
   const u = perfil; // referencia não-nula para uso nos handlers async
@@ -99,8 +101,14 @@ export default function PerfilPage() {
             <p className="mt-0.5 flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:justify-start">
               <Mail className="size-3.5" /> {perfil.email}
             </p>
+            <p className="mt-0.5 flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:justify-start">
+              <Phone className="size-3.5" /> {perfil.telefone}
+            </p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              <Button variant="outline" size="sm" onClick={() => setEditarAberto(true)}>
+                <Pencil className="size-4" /> Editar dados
+              </Button>
               <Button
                 variant="primary"
                 size="sm"
@@ -131,6 +139,8 @@ export default function PerfilPage() {
           A imagem é reduzida automaticamente para carregar rápido. Formatos aceitos: JPG e PNG.
         </p>
       </section>
+
+      <EditarPerfilDialog perfil={u} open={editarAberto} onOpenChange={setEditarAberto} />
     </main>
   );
 }

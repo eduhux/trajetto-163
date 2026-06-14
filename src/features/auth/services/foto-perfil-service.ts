@@ -49,6 +49,25 @@ export async function uploadFotoPerfil(uid: string, file: File): Promise<string>
   return url;
 }
 
+/** Atualiza dados básicos do perfil (nome, telefone, cidade, estado). */
+export async function atualizarDadosPerfil(
+  uid: string,
+  dados: {
+    nomeCompleto: string;
+    telefone: string;
+    cidade: string;
+    estado: "SP" | "MS";
+  },
+): Promise<void> {
+  await updateDoc(doc(db, COLLECTIONS.users, uid), {
+    nomeCompleto: dados.nomeCompleto,
+    telefone: dados.telefone,
+    cidade: dados.cidade,
+    estado: dados.estado,
+    atualizadoEm: serverTimestamp(),
+  });
+}
+
 /** Remove a foto do perfil (mantém o arquivo no Storage, só desvincula). */
 export async function removerFotoPerfil(uid: string): Promise<void> {
   await updateDoc(doc(db, COLLECTIONS.users, uid), {
