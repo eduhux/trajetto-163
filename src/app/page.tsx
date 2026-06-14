@@ -1,3 +1,4 @@
+import { BeamsBackground } from "@/components/ui/beams-background";
 import { SiteHeader } from "@/components/landing/site-header";
 import { Hero } from "@/components/landing/hero";
 import { ComoFunciona } from "@/components/landing/como-funciona";
@@ -9,15 +10,18 @@ import { SiteFooter } from "@/components/landing/site-footer";
 export default function HomePage() {
   return (
     <>
-      <SiteHeader />
-      <main>
-        <Hero />
-        <ComoFunciona />
-        <Recursos />
-        <Planos />
-        <CtaFinal />
-      </main>
-      <SiteFooter />
+      <BeamsBackground />
+      <div className="relative z-10">
+        <SiteHeader />
+        <main>
+          <Hero />
+          <ComoFunciona />
+          <Recursos />
+          <Planos />
+          <CtaFinal />
+        </main>
+        <SiteFooter />
+      </div>
     </>
   );
 }
