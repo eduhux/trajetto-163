@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PackageSearch, SearchX } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { TelaCarregando } from "@/components/shared/loading";
+import { CabecalhoPagina } from "@/components/shared/cabecalho-pagina";
+import { EstadoVazio } from "@/components/shared/estado-vazio";
 import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConversar } from "@/features/chat/components/botao-conversar";
 import {
@@ -108,18 +110,19 @@ export default function FretesPage() {
 
   return (
     <main className="container py-10">
-      <h1 className="font-display text-3xl font-bold tracking-tight">Fretes disponíveis</h1>
-      <p className="mt-1 text-muted-foreground">
-        Carga pesada esperando carreta entre todas as cidades de SP e MS.
-      </p>
+      <CabecalhoPagina
+        titulo="Fretes disponíveis"
+        descricao="Carga pesada esperando carreta entre todas as cidades de SP e MS."
+      />
 
       {todos === null ? (
         <TelaCarregando texto="Buscando fretes..." />
       ) : todos.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-          <PackageSearch className="size-8 text-trajetto" />
-          <p className="text-sm">Ainda não há fretes publicados. Volte em breve!</p>
-        </div>
+        <EstadoVazio
+          icone={PackageSearch}
+          titulo="Ainda não há fretes publicados"
+          descricao="Volte em breve — novas cargas aparecem por aqui o tempo todo."
+        />
       ) : (
         <>
           <div className="mt-6">
@@ -133,12 +136,11 @@ export default function FretesPage() {
           </p>
 
           {filtrados.length === 0 ? (
-            <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-              <SearchX className="size-8 text-trajetto" />
-              <p className="text-sm">
-                Tente afrouxar os filtros (mudar o valor, a urgência ou a rota).
-              </p>
-            </div>
+            <EstadoVazio
+              icone={SearchX}
+              titulo="Nenhum frete com esses filtros"
+              descricao="Tente afrouxar os filtros — mudar o valor, a urgência ou a rota."
+            />
           ) : (
             <>
               <div className="mt-4 grid gap-4 md:grid-cols-2">

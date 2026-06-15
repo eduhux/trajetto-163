@@ -6,6 +6,8 @@ import { PackageCheck, Search, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
+import { CabecalhoPagina } from "@/components/shared/cabecalho-pagina";
+import { EstadoVazio } from "@/components/shared/estado-vazio";
 import { FreteCard } from "@/features/fretes/components/frete-card";
 import { AvaliarClienteDialog } from "@/features/avaliacoes/components/avaliar-cliente-dialog";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -34,23 +36,26 @@ export default function FretesRealizadosPage() {
 
   return (
     <main className="container py-10">
-      <h1 className="font-display text-3xl font-bold tracking-tight">Fretes realizados</h1>
-      <p className="mt-1 text-muted-foreground">
-        Histórico das cargas que você transportou. Avalie os clientes que atendeu.
-      </p>
+      <CabecalhoPagina
+        titulo="Fretes realizados"
+        descricao="Histórico das cargas que você transportou. Avalie os clientes que atendeu."
+      />
 
       {fretes === null ? (
         <TelaCarregando texto="Carregando seu histórico..." />
       ) : fretes.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-          <PackageCheck className="size-8 text-trajetto" />
-          <p className="text-sm">Você ainda não realizou nenhum frete.</p>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/fretes">
-              <Search className="size-4" /> Buscar cargas
-            </Link>
-          </Button>
-        </div>
+        <EstadoVazio
+          icone={PackageCheck}
+          titulo="Nenhum frete realizado ainda"
+          descricao="Quando você concluir uma carga, ela aparece aqui para você avaliar o cliente."
+          acao={
+            <Button asChild variant="primary" size="md">
+              <Link href="/fretes">
+                <Search className="size-4" /> Buscar cargas
+              </Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {fretes.map((f) => (

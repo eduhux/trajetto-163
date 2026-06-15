@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PlusCircle, Inbox, Pencil, XCircle, Loader2 } from "lucide-react";
+import { PlusCircle, Inbox, Pencil, XCircle, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
+import { CabecalhoPagina } from "@/components/shared/cabecalho-pagina";
+import { EstadoVazio } from "@/components/shared/estado-vazio";
 import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -61,32 +64,56 @@ export default function MeusFretesPage() {
 
   return (
     <main className="container py-10">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Meus fretes</h1>
-          {limite !== Infinity && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Plano gratuito: {usadosMes} de {limite} publicações usadas este mês.
-            </p>
-          )}
-        </div>
-        <Button asChild variant="primary" size="md">
-          <Link href="/publicar">
-            <PlusCircle className="size-4" /> Novo frete
-          </Link>
-        </Button>
-      </div>
+      <CabecalhoPagina
+        titulo="Meus fretes"
+        descricao="Gerencie suas cargas publicadas: edite, conclua ou cancele."
+        acao={
+          <Button asChild variant="primary" size="md">
+            <Link href="/publicar">
+              <PlusCircle className="size-4" /> Novo frete
+            </Link>
+          </Button>
+        }
+      >
+        {limite === Infinity ? (
+          <Badge variant="lime" className="mt-3">
+            <Crown className="size-3" /> Premium · publicações ilimitadas
+          </Badge>
+        ) : (
+          <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-border bg-secondary/40 px-3.5 py-2">
+            <span className="text-xs text-muted-foreground">Plano gratuito</span>
+            <span className="h-3.5 w-px bg-border" />
+            <span className="text-xs">
+              <span className="font-mono font-semibold text-foreground">
+                {usadosMes}/{limite}
+              </span>{" "}
+              <span className="text-muted-foreground">publicações este mês</span>
+            </span>
+            <span className="relative h-1.5 w-20 overflow-hidden rounded-full bg-secondary">
+              <span
+                className="absolute inset-y-0 left-0 rounded-full bg-trajetto"
+                style={{ width: `${Math.min(100, (usadosMes / limite) * 100)}%` }}
+              />
+            </span>
+          </div>
+        )}
+      </CabecalhoPagina>
 
       {fretes === null ? (
         <TelaCarregando texto="Carregando seus fretes..." />
       ) : fretes.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-          <Inbox className="size-8 text-trajetto" />
-          <p className="text-sm">Você ainda não publicou nenhum frete.</p>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/publicar">Publicar o primeiro</Link>
-          </Button>
-        </div>
+        <EstadoVazio
+          icone={Inbox}
+          titulo="Nenhum frete publicado ainda"
+          descricao="Publique sua primeira carga e os motoristas que rodam SP ⇄ MS vão ver o anúncio."
+          acao={
+            <Button asChild variant="primary" size="md">
+              <Link href="/publicar">
+                <PlusCircle className="size-4" /> Publicar o primeiro
+              </Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {fretes.map((f) => (
