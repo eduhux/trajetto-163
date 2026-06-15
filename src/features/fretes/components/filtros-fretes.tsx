@@ -3,6 +3,7 @@
 import { SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CidadeCombobox } from "@/features/fretes/components/cidade-combobox";
 import type { EstadoUF, Urgencia } from "@/types";
 
 export type Ordenacao = "destaque" | "recentes" | "maior_valor" | "menor_valor";
@@ -10,6 +11,8 @@ export type Ordenacao = "destaque" | "recentes" | "maior_valor" | "menor_valor";
 export interface FiltrosFrete {
   origem: EstadoUF | "";
   destino: EstadoUF | "";
+  cidadeOrigem: string;
+  cidadeDestino: string;
   urgencia: Urgencia | "";
   valorMin: string;
   valorMax: string;
@@ -20,6 +23,8 @@ export interface FiltrosFrete {
 export const FILTROS_PADRAO: FiltrosFrete = {
   origem: "",
   destino: "",
+  cidadeOrigem: "",
+  cidadeDestino: "",
   urgencia: "",
   valorMin: "",
   valorMax: "",
@@ -34,6 +39,8 @@ function temFiltroAtivo(f: FiltrosFrete): boolean {
   return (
     !!f.origem ||
     !!f.destino ||
+    !!f.cidadeOrigem ||
+    !!f.cidadeDestino ||
     !!f.urgencia ||
     !!f.valorMin ||
     !!f.valorMax ||
@@ -60,42 +67,70 @@ export function FiltrosFretes({
           <SlidersHorizontal className="size-4 text-trajetto" /> Filtros
         </span>
         {temFiltroAtivo(valor) && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onChange(FILTROS_PADRAO)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => onChange(FILTROS_PADRAO)}>
             <X className="size-4" /> Limpar
           </Button>
         )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <label className="block">
+        {/* Origem: estado + cidade */}
+        <div className="block">
           <span className="mb-1.5 block text-xs text-muted-foreground">Origem</span>
           <select
             className={selectCls}
             value={valor.origem}
-            onChange={(e) => set("origem", e.target.value as FiltrosFrete["origem"])}
+            onChange={(e) =>
+              onChange({
+                ...valor,
+                origem: e.target.value as FiltrosFrete["origem"],
+                cidadeOrigem: "",
+              })
+            }
           >
-            <option value="">Todas</option>
+            <option value="">Todos os estados</option>
             <option value="SP">São Paulo (SP)</option>
             <option value="MS">Mato Grosso do Sul (MS)</option>
           </select>
-        </label>
+          {valor.origem && (
+            <div className="mt-2">
+              <CidadeCombobox
+                estado={valor.origem}
+                value={valor.cidadeOrigem}
+                onChange={(c) => set("cidadeOrigem", c)}
+              />
+            </div>
+          )}
+        </div>
 
-        <label className="block">
+        {/* Destino: estado + cidade */}
+        <div className="block">
           <span className="mb-1.5 block text-xs text-muted-foreground">Destino</span>
           <select
             className={selectCls}
             value={valor.destino}
-            onChange={(e) => set("destino", e.target.value as FiltrosFrete["destino"])}
+            onChange={(e) =>
+              onChange({
+                ...valor,
+                destino: e.target.value as FiltrosFrete["destino"],
+                cidadeDestino: "",
+              })
+            }
           >
-            <option value="">Todos</option>
+            <option value="">Todos os estados</option>
             <option value="SP">São Paulo (SP)</option>
             <option value="MS">Mato Grosso do Sul (MS)</option>
           </select>
-        </label>
+          {valor.destino && (
+            <div className="mt-2">
+              <CidadeCombobox
+                estado={valor.destino}
+                value={valor.cidadeDestino}
+                onChange={(c) => set("cidadeDestino", c)}
+              />
+            </div>
+          )}
+        </div>
 
         <label className="block">
           <span className="mb-1.5 block text-xs text-muted-foreground">Urgência</span>
@@ -147,11 +182,9 @@ export function FiltrosFretes({
       </div>
 
       <label className="mt-4 block">
-        <span className="mb-1.5 block text-xs text-muted-foreground">
-          Buscar por cidade ou carga
-        </span>
+        <span className="mb-1.5 block text-xs text-muted-foreground">Buscar por carga</span>
         <Input
-          placeholder="Ex: Campo Grande, soja, paletes..."
+          placeholder="Ex.: soja, paletes, bebidas..."
           value={valor.busca}
           onChange={(e) => set("busca", e.target.value)}
         />

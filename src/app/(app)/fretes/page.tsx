@@ -51,6 +51,8 @@ export default function FretesPage() {
     const lista = todos.filter((f) => {
       if (filtros.origem && f.estadoOrigem !== filtros.origem) return false;
       if (filtros.destino && f.estadoDestino !== filtros.destino) return false;
+      if (filtros.cidadeOrigem && f.cidadeOrigem !== filtros.cidadeOrigem) return false;
+      if (filtros.cidadeDestino && f.cidadeDestino !== filtros.cidadeDestino) return false;
       if (filtros.urgencia && f.urgencia !== filtros.urgencia) return false;
       if (min !== null && f.valorFrete < min) return false;
       if (max !== null && f.valorFrete > max) return false;
