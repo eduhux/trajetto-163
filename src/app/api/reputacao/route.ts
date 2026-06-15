@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
           id: d.id,
           autorNome: ehCarreteiro
             ? (a.clienteNome ?? "Cliente")
-            : (a.avaliadorNome ?? "Carreteiro"),
+            : (a.avaliadorNome ?? "Motorista"),
           nota: a.nota ?? 0,
           comentario: a.comentario ?? null,
           criadoEm: ms(a.criadoEm),

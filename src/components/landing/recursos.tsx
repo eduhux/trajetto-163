@@ -14,7 +14,7 @@ const RECURSOS = [
   },
   {
     icone: ShieldCheck,
-    titulo: "Carreteiros com perfil",
+    titulo: "Motoristas com perfil",
     desc: "CNH, veículo e capacidade de carga no perfil. Você sabe com quem está fechando.",
   },
   {

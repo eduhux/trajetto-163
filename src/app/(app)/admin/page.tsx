@@ -170,7 +170,7 @@ export default function AdminPage() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium">{u.nomeCompleto}</span>
-                  <Badge variant="outline" className="uppercase">{u.tipoConta === "motorista" ? "Carreteiro" : "Cliente"}</Badge>
+                  <Badge variant="outline" className="uppercase">{u.tipoConta === "motorista" ? "Motorista" : "Cliente"}</Badge>
                   <Badge variant="outline" className="uppercase">{u.plano}</Badge>
                   {u.admin && <Badge variant="lime" className="uppercase">Admin</Badge>}
                   {u.suspenso && <Badge variant="outline" className="border-destructive/40 uppercase text-destructive">Suspenso</Badge>}

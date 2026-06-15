@@ -203,7 +203,7 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
         <span>
           <span className="font-medium text-foreground">Valor a combinar pelo chat</span>
           <span className="block text-xs text-muted-foreground">
-            Marque se prefere negociar o valor direto com o carreteiro, sem definir agora.
+            Marque se prefere negociar o valor direto com o motorista, sem definir agora.
           </span>
         </span>
       </label>
@@ -222,7 +222,7 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
       </div>
 
       <Field label="Observações" htmlFor="observacoes" hint="opcional" error={errors.observacoes?.message}>
-        <Textarea id="observacoes" placeholder="Algum detalhe importante para o carreteiro?" {...register("observacoes")} />
+        <Textarea id="observacoes" placeholder="Algum detalhe importante para o motorista?" {...register("observacoes")} />
       </Field>
 
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>

@@ -116,7 +116,7 @@ export async function listarFretesAtivos(): Promise<FreteDoc[]> {
   return ordenar(fretes);
 }
 
-/** Lista os fretes que um carreteiro realizou (finalizados, ele como motorista). */
+/** Lista os fretes que um motorista realizou (finalizados, ele como motorista). */
 export async function listarFretesRealizados(uid: string): Promise<FreteDoc[]> {
   const snap = await getDocs(
     query(collection(db, COLLECTIONS.fretes), where("motoristaUid", "==", uid)),

@@ -75,7 +75,7 @@ export function ReputacaoDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
         <DialogTitle className="font-display text-lg font-semibold">
-          Reputação {ehCarreteiro ? "do carreteiro" : "do cliente"}
+          Reputação {ehCarreteiro ? "do motorista" : "do cliente"}
         </DialogTitle>
 
         {carregando ? (
@@ -102,7 +102,7 @@ export function ReputacaoDialog({
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-display text-lg font-bold">{user.nomeCompleto}</p>
                   {ehCarreteiro ? (
-                    <Badge variant="lime"><Truck className="size-3" /> Carreteiro</Badge>
+                    <Badge variant="lime"><Truck className="size-3" /> Motorista</Badge>
                   ) : (
                     <Badge variant="outline"><Package className="size-3" /> Cliente</Badge>
                   )}
@@ -129,7 +129,7 @@ export function ReputacaoDialog({
               </div>
             )}
 
-            {/* Veiculo (carreteiro) */}
+            {/* Veiculo (motorista) */}
             {ehCarreteiro && (
               <div className="rounded-2xl bg-background/30 p-4 ring-1 ring-inset ring-border">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

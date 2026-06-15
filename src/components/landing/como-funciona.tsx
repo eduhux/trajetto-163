@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 const CLIENTE = [
   "Crie sua conta e escolha um plano",
   "Publique o frete com origem, destino e detalhes da carga",
-  "Receba contatos de carreteiros interessados",
+  "Receba contatos de motoristas interessados",
   "Converse pelo chat e feche o transporte",
-  "Finalize e avalie o carreteiro",
+  "Finalize e avalie o motorista",
 ];
 
 const MOTORISTA = [
@@ -70,7 +70,7 @@ export function ComoFunciona() {
           </h2>
           <p className="mt-4 text-muted-foreground">
             Sem leilão escondido e sem intermediário ditando preço. Cliente e
-            carreteiro se encontram e combinam direto.
+            motorista se encontram e combinam direto.
           </p>
         </Reveal>
 

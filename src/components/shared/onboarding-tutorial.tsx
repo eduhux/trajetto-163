@@ -20,9 +20,9 @@ type Passo = { icone: ComponentType<{ className?: string }>; titulo: string; tex
 
 const CLIENTE: Passo[] = [
   { icone: PlusCircle, titulo: "Publique sua carga", texto: "Descreva o que precisa transportar, a rota (origem e destino) e o valor. Leva menos de um minuto." },
-  { icone: MessageSquare, titulo: "Receba carreteiros", texto: "Eles entram em contato pelo chat. Veja a reputação de cada um antes de fechar negócio." },
+  { icone: MessageSquare, titulo: "Receba motoristas", texto: "Eles entram em contato pelo chat. Veja a reputação de cada um antes de fechar negócio." },
   { icone: ShieldCheck, titulo: "Combine com segurança", texto: "Negocie tudo pelo chat. Por segurança, telefone e WhatsApp ficam bloqueados nas mensagens." },
-  { icone: CheckCircle2, titulo: "Conclua só na entrega", texto: "Finalize e avalie o carreteiro apenas quando a carga chegar ao destino em segurança — aí o contato é encerrado." },
+  { icone: CheckCircle2, titulo: "Conclua só na entrega", texto: "Finalize e avalie o motorista apenas quando a carga chegar ao destino em segurança — aí o contato é encerrado." },
 ];
 
 const CARRETEIRO: Passo[] = [
@@ -58,7 +58,7 @@ export function OnboardingTutorial({
               <Logo size="md" />
             </div>
             <h2 className="mt-6 font-display text-2xl font-bold tracking-tight">
-              {ehCarreteiro ? "Bem-vindo, carreteiro!" : "Bem-vindo!"}
+              {ehCarreteiro ? "Bem-vindo, motorista!" : "Bem-vindo!"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Quer um tour rápido de como usar a plataforma? Leva uns 30 segundos.

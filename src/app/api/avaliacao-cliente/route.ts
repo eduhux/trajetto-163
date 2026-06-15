@@ -7,7 +7,7 @@ import { contemContato } from "@/lib/moderacao/contato";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Carreteiro avalia o cliente de um frete que ele realizou. */
+/** Motorista avalia o cliente de um frete que ele realizou. */
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization") ?? "";
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
       const avaliadorNome =
         (avaliadorSnap.exists ? (avaliadorSnap.data()!.nomeCompleto as string) : "") ||
-        "Carreteiro";
+        "Motorista";
 
       tx.set(avaliacaoRef, {
         freteId,

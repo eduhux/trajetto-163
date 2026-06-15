@@ -21,7 +21,7 @@ export default function MeusFretesPage() {
   const [cancelando, setCancelando] = useState<string | null>(null);
 
   async function handleCancelar(id: string) {
-    if (!window.confirm("Cancelar este frete? Ele sai do ar para os carreteiros.")) return;
+    if (!window.confirm("Cancelar este frete? Ele sai do ar para os motoristas.")) return;
     setCancelando(id);
     try {
       await cancelarFrete(id);
@@ -33,7 +33,7 @@ export default function MeusFretesPage() {
     }
   }
 
-  // Carreteiro não publica fretes — leva para "Fretes realizados".
+  // Motorista não publica fretes — leva para "Fretes realizados".
   useEffect(() => {
     if (perfil?.tipoConta === "motorista") router.replace("/realizados");
   }, [perfil, router]);

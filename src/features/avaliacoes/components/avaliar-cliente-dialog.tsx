@@ -53,7 +53,7 @@ export function AvaliarClienteDialog({
         </DialogTitle>
         <DialogDescription className="mt-1 text-sm text-muted-foreground">
           Como foi negociar e atender este cliente? Sua avaliação ajuda outros
-          carreteiros.
+          motoristas.
         </DialogDescription>
 
         <div className="mt-5">

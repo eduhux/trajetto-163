@@ -42,7 +42,7 @@ export interface FreteDoc extends BaseDocument {
 
   // Vinculo apos finalizacao (para avaliacao)
   motoristaUid: string | null;
-  // Marca que o carreteiro ja avaliou o cliente deste frete (avaliacao mutua).
+  // Marca que o motorista ja avaliou o cliente deste frete (avaliacao mutua).
   clienteAvaliado?: boolean;
 }
 
@@ -112,11 +112,11 @@ export interface ConfiguracaoDoc {
   atualizadoEm: FirestoreDate;
 }
 
-/** Avaliacao do CLIENTE feita por um carreteiro (avaliacao mutua). */
+/** Avaliacao do CLIENTE feita por um motorista (avaliacao mutua). */
 export interface AvaliacaoClienteDoc extends BaseDocument {
   freteId: string;
   clienteUid: string; // avaliado
-  avaliadorUid: string; // carreteiro que avaliou
+  avaliadorUid: string; // motorista que avaliou
   avaliadorNome: string;
   nota: 1 | 2 | 3 | 4 | 5;
   comentario: string | null;

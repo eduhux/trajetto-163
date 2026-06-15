@@ -52,7 +52,7 @@ export default function EditarFretePage() {
     <main className="container max-w-2xl py-10">
       <h1 className="font-display text-3xl font-bold tracking-tight">Editar frete</h1>
       <p className="mt-1 text-muted-foreground">
-        Atualize os dados da carga. As alterações aparecem na hora para os carreteiros.
+        Atualize os dados da carga. As alterações aparecem na hora para os motoristas.
       </p>
       <div className="mt-8">
         <PublicarFreteForm frete={frete} />

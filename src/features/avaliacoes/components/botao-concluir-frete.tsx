@@ -102,7 +102,7 @@ export function BotaoConcluirFrete({
             Concluir e avaliar
           </DialogTitle>
           <DialogDescription className="mt-1 text-sm text-muted-foreground">
-            Escolha o carreteiro que realizou o frete e dê uma nota. Isso ajuda
+            Escolha o motorista que realizou o frete e dê uma nota. Isso ajuda
             outros clientes a confiarem na plataforma.
           </DialogDescription>
 
@@ -111,7 +111,7 @@ export function BotaoConcluirFrete({
             <span>
               Conclua <strong className="font-semibold">somente quando a carga
               for entregue no destino em segurança</strong>. Ao concluir, o frete
-              sai do ar e o contato com o carreteiro é encerrado.
+              sai do ar e o contato com o motorista é encerrado.
             </span>
           </div>
 
@@ -179,7 +179,7 @@ export function BotaoConcluirFrete({
                   onChange={(e) => setComentario(e.target.value)}
                   rows={3}
                   maxLength={400}
-                  placeholder="Como foi a experiência com este carreteiro?"
+                  placeholder="Como foi a experiência com este motorista?"
                   className="w-full resize-none rounded-lg border border-border bg-background p-3 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-trajetto"
                 />
               </div>

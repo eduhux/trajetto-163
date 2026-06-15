@@ -32,7 +32,7 @@ export function CtaFinal() {
                 <Link href="/cadastro?tipo=cliente">Quero enviar uma carga</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/cadastro?tipo=motorista">Sou carreteiro</Link>
+                <Link href="/cadastro?tipo=motorista">Sou motorista</Link>
               </Button>
             </div>
           </div>

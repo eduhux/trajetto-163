@@ -90,7 +90,7 @@ export default function PerfilPage() {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2 className="font-display text-xl font-bold">{perfil.nomeCompleto}</h2>
               {ehCarreteiro ? (
-                <Badge variant="lime"><Truck className="size-3" /> Carreteiro</Badge>
+                <Badge variant="lime"><Truck className="size-3" /> Motorista</Badge>
               ) : (
                 <Badge variant="outline"><Package className="size-3" /> Cliente</Badge>
               )}

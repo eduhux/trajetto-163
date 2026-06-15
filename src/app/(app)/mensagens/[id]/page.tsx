@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, ChevronRight, Loader2, Package, Paperclip, SendHorizonal, ShieldCheck, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Package, Paperclip, SendHorizonal, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -167,67 +167,40 @@ export default function ConversaPage() {
         <p className="font-medium">{nomeOutro}</p>
       </div>
 
-      {/* Referência do frete: deixa claro de qual frete é esta conversa.
-         Para o dono (cliente) é clicável e abre em "Meus fretes"; para o
-         motorista fica apenas informativo. */}
-      {frete &&
-        (() => {
-          const souDono = frete.clienteUid === perfil.uid;
-          const conteudo = (
-            <>
-              <span className="flex min-w-0 items-center gap-3">
-                <Package className="size-5 shrink-0 text-trajetto" />
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1.5 text-sm font-medium">
-                    <span className="truncate">{frete.cidadeOrigem}</span>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {frete.estadoOrigem}
-                    </span>
-                    <ArrowRight className="size-3.5 shrink-0 text-trajetto" />
-                    <span className="truncate">{frete.cidadeDestino}</span>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {frete.estadoDestino}
-                    </span>
+      {/* Referência do frete: deixa claro de qual frete é esta conversa */}
+      {frete && (
+        <div className="container max-w-2xl pt-3">
+          <div className="surface flex items-center justify-between gap-3 rounded-2xl p-3.5">
+            <span className="flex min-w-0 items-center gap-3">
+              <Package className="size-5 shrink-0 text-trajetto" />
+              <span className="min-w-0">
+                <span className="flex items-center gap-1.5 text-sm font-medium">
+                  <span className="truncate">{frete.cidadeOrigem}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {frete.estadoOrigem}
                   </span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {frete.descricaoCarga}
+                  <ArrowRight className="size-3.5 shrink-0 text-trajetto" />
+                  <span className="truncate">{frete.cidadeDestino}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {frete.estadoDestino}
                   </span>
                 </span>
-              </span>
-              <span className="flex shrink-0 items-center gap-2 text-right">
-                <span>
-                  <span className="block font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Frete
-                  </span>
-                  <span className="block text-sm font-semibold text-trajetto">
-                    {frete.valorACombinar ? "A combinar" : formatCurrencyBRL(frete.valorFrete)}
-                  </span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {frete.descricaoCarga}
                 </span>
-                {souDono && (
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-                )}
               </span>
-            </>
-          );
-
-          return (
-            <div className="container max-w-2xl pt-3">
-              {souDono ? (
-                <button
-                  type="button"
-                  onClick={() => router.push(`/meus-fretes/${frete.id}`)}
-                  className="surface surface-hover flex w-full items-center justify-between gap-3 rounded-2xl p-3.5 text-left"
-                >
-                  {conteudo}
-                </button>
-              ) : (
-                <div className="surface flex items-center justify-between gap-3 rounded-2xl p-3.5">
-                  {conteudo}
-                </div>
-              )}
-            </div>
-          );
-        })()}
+            </span>
+            <span className="shrink-0 text-right">
+              <span className="block font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                Frete
+              </span>
+              <span className="block text-sm font-semibold text-trajetto">
+                {frete.valorACombinar ? "A combinar" : formatCurrencyBRL(frete.valorFrete)}
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Card privado de reputação — visível só para os dois da conversa */}
       <div className="container max-w-2xl pt-3">

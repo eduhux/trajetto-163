@@ -36,7 +36,7 @@ function CadastroConteudo() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t === "cliente" ? "Sou cliente" : "Sou carreteiro"}
+            {t === "cliente" ? "Sou cliente" : "Sou motorista"}
           </button>
         ))}
       </div>

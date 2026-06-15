@@ -74,7 +74,7 @@ export function Hero() {
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link href="/cadastro?tipo=motorista">
-                <Truck /> Sou carreteiro <ArrowRight />
+                <Truck /> Sou motorista <ArrowRight />
               </Link>
             </Button>
           </motion.div>
