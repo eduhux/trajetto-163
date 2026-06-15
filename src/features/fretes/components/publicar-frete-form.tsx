@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, type DefaultValues } from "react-hook-form";
+import { useForm, Controller, type DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Timestamp } from "firebase/firestore";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/ui/field";
+import { CidadeCombobox } from "@/features/fretes/components/cidade-combobox";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useUIStore } from "@/stores";
 import { publicarFreteSchema, type PublicarFreteInput } from "@/lib/validations";
 import { publicarFrete, atualizarFrete } from "@/features/fretes/services/frete-service";
-import type { FreteDoc } from "@/types";
+import type { EstadoUF, FreteDoc } from "@/types";
 
 function paraInputDate(v: FreteDoc["dataColeta"]): string {
   const ms = v instanceof Timestamp ? v.toMillis() : typeof v === "number" ? v : 0;
@@ -57,6 +58,8 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
     register,
     handleSubmit,
     watch,
+    control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<PublicarFreteInput>({
     resolver: zodResolver(publicarFreteSchema),
@@ -64,6 +67,20 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
   });
 
   const valorACombinar = watch("valorACombinar");
+  const estadoOrigem = watch("estadoOrigem") as EstadoUF | "" | undefined;
+  const estadoDestino = watch("estadoDestino") as EstadoUF | "" | undefined;
+
+  // Ao trocar o estado, limpa a cidade (sem apagar o valor pré-preenchido na 1ª carga).
+  const montouOrigem = useRef(false);
+  const montouDestino = useRef(false);
+  useEffect(() => {
+    if (!montouOrigem.current) { montouOrigem.current = true; return; }
+    setValue("cidadeOrigem", "");
+  }, [estadoOrigem, setValue]);
+  useEffect(() => {
+    if (!montouDestino.current) { montouDestino.current = true; return; }
+    setValue("cidadeDestino", "");
+  }, [estadoDestino, setValue]);
 
   async function onSubmit(data: PublicarFreteInput) {
     if (!perfil) return;
@@ -103,9 +120,6 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-4 rounded-xl border border-border p-4">
           <p className="font-mono text-xs uppercase tracking-wider text-trajetto">Origem</p>
-          <Field label="Cidade de origem" htmlFor="cidadeOrigem" error={errors.cidadeOrigem?.message}>
-            <Input id="cidadeOrigem" aria-invalid={!!errors.cidadeOrigem} {...register("cidadeOrigem")} />
-          </Field>
           <Field label="Estado" htmlFor="estadoOrigem" error={errors.estadoOrigem?.message}>
             <Select id="estadoOrigem" defaultValue="" aria-invalid={!!errors.estadoOrigem} {...register("estadoOrigem")}>
               <option value="" disabled>UF</option>
@@ -113,19 +127,46 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
               <option value="SP">SP</option>
             </Select>
           </Field>
+          <Field label="Cidade de origem" htmlFor="cidadeOrigem" error={errors.cidadeOrigem?.message}>
+            <Controller
+              control={control}
+              name="cidadeOrigem"
+              render={({ field }) => (
+                <CidadeCombobox
+                  id="cidadeOrigem"
+                  estado={estadoOrigem}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  invalido={!!errors.cidadeOrigem}
+                />
+              )}
+            />
+          </Field>
         </div>
 
         <div className="space-y-4 rounded-xl border border-border p-4">
           <p className="font-mono text-xs uppercase tracking-wider text-trajetto">Destino</p>
-          <Field label="Cidade de destino" htmlFor="cidadeDestino" error={errors.cidadeDestino?.message}>
-            <Input id="cidadeDestino" aria-invalid={!!errors.cidadeDestino} {...register("cidadeDestino")} />
-          </Field>
           <Field label="Estado" htmlFor="estadoDestino" error={errors.estadoDestino?.message}>
             <Select id="estadoDestino" defaultValue="" aria-invalid={!!errors.estadoDestino} {...register("estadoDestino")}>
               <option value="" disabled>UF</option>
               <option value="MS">MS</option>
               <option value="SP">SP</option>
             </Select>
+          </Field>
+          <Field label="Cidade de destino" htmlFor="cidadeDestino" error={errors.cidadeDestino?.message}>
+            <Controller
+              control={control}
+              name="cidadeDestino"
+              render={({ field }) => (
+                <CidadeCombobox
+                  id="cidadeDestino"
+                  estado={estadoDestino}
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  invalido={!!errors.cidadeDestino}
+                />
+              )}
+            />
           </Field>
         </div>
       </div>
