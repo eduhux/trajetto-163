@@ -44,22 +44,26 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
           descricaoCarga: frete.descricaoCarga,
           pesoKg: String(frete.pesoKg),
           volumeM3: frete.volumeM3 != null ? String(frete.volumeM3) : "",
-          valorFrete: String(frete.valorFrete),
+          valorACombinar: frete.valorACombinar ?? false,
+          valorFrete: frete.valorACombinar ? "" : String(frete.valorFrete),
           dataColeta: paraInputDate(frete.dataColeta),
           observacoes: frete.observacoes ?? "",
           urgencia: frete.urgencia,
         }
-      : { urgencia: "normal" }
+      : { urgencia: "normal", valorACombinar: false }
   ) as unknown as DefaultValues<PublicarFreteInput>;
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<PublicarFreteInput>({
     resolver: zodResolver(publicarFreteSchema),
     defaultValues: valoresIniciais,
   });
+
+  const valorACombinar = watch("valorACombinar");
 
   async function onSubmit(data: PublicarFreteInput) {
     if (!perfil) return;
@@ -138,9 +142,30 @@ export function PublicarFreteForm({ frete }: { frete?: FreteDoc }) {
           <Input id="volumeM3" inputMode="numeric" {...register("volumeM3")} />
         </Field>
         <Field label="Valor do frete (R$)" htmlFor="valorFrete" error={errors.valorFrete?.message}>
-          <Input id="valorFrete" inputMode="numeric" aria-invalid={!!errors.valorFrete} {...register("valorFrete")} />
+          <Input
+            id="valorFrete"
+            inputMode="numeric"
+            disabled={valorACombinar}
+            placeholder={valorACombinar ? "A combinar" : "Ex.: 6300"}
+            aria-invalid={!!errors.valorFrete}
+            {...register("valorFrete")}
+          />
         </Field>
       </div>
+
+      <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border bg-background/30 p-3 text-sm">
+        <input
+          type="checkbox"
+          className="size-4 shrink-0 cursor-pointer accent-trajetto"
+          {...register("valorACombinar")}
+        />
+        <span>
+          <span className="font-medium text-foreground">Valor a combinar pelo chat</span>
+          <span className="block text-xs text-muted-foreground">
+            Marque se prefere negociar o valor direto com o carreteiro, sem definir agora.
+          </span>
+        </span>
+      </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Data da coleta" htmlFor="dataColeta" error={errors.dataColeta?.message}>

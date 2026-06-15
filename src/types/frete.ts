@@ -24,6 +24,8 @@ export interface FreteDoc extends BaseDocument {
   pesoKg: number;
   volumeM3: number | null;
   valorFrete: number;
+  // Quando true, o valor sera combinado no chat (valorFrete fica 0).
+  valorACombinar?: boolean;
   dataColeta: FirestoreDate;
   observacoes: string | null;
   urgencia: Urgencia;

@@ -1,4 +1,7 @@
-import { ArrowRight, Calendar, Package, Star, Weight } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { ArrowRight, Calendar, MessageSquareText, Package, Star, Weight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyBRL, formatDateBR } from "@/lib/utils";
@@ -24,6 +27,8 @@ export function FreteCard({
   frete: FreteDoc;
   acao?: ReactNode;
 }) {
+  const [verObs, setVerObs] = useState(false);
+
   return (
     <article className="surface surface-hover rounded-2xl p-5">
       <div className="flex items-start justify-between gap-3">
@@ -61,11 +66,36 @@ export function FreteCard({
         </span>
       </div>
 
+      {frete.observacoes && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => setVerObs((v) => !v)}
+            className="flex items-center gap-1.5 text-xs font-medium text-trajetto hover:underline"
+          >
+            <MessageSquareText className="size-3.5" />
+            {verObs ? "Ocultar observações" : "Ver observações"}
+          </button>
+          {verObs && (
+            <p className="mt-2 whitespace-pre-line rounded-lg border border-border/60 bg-background/30 p-3 text-sm text-muted-foreground">
+              {frete.observacoes}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
         <div>
-          <p className="font-display text-xl font-bold text-foreground">
-            {formatCurrencyBRL(frete.valorFrete)}
+          <p className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
+            Valor do frete
           </p>
+          {frete.valorACombinar ? (
+            <p className="font-display text-xl font-bold text-trajetto">A combinar</p>
+          ) : (
+            <p className="font-display text-xl font-bold text-foreground">
+              {formatCurrencyBRL(frete.valorFrete)}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground">por {frete.clienteNome}</p>
         </div>
         {acao ?? (
