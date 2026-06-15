@@ -10,6 +10,8 @@ const badgeVariants = cva(
         default: "border-transparent bg-secondary text-secondary-foreground",
         lime: "border-trajetto/30 bg-trajetto/10 text-trajetto",
         rodovia: "border-rodovia-400/30 bg-rodovia-400/10 text-rodovia-400",
+        success: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+        destructive: "border-destructive/40 bg-destructive/10 text-destructive",
         outline: "border-border text-foreground",
       },
     },

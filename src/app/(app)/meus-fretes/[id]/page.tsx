@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Pencil, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
 import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
@@ -106,15 +105,7 @@ export default function VerFretePage() {
               </Button>
               <BotaoConcluirFrete frete={frete} onConcluido={carregar} />
             </div>
-          ) : frete.status === "cancelado" ? (
-            <Badge variant="outline" className="border-destructive/40 uppercase text-destructive">
-              Cancelado
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="uppercase">
-              Finalizado
-            </Badge>
-          )
+          ) : undefined
         }
       />
     </main>

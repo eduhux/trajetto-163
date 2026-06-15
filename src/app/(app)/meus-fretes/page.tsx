@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PlusCircle, Inbox, Pencil, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
 import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
@@ -118,13 +117,7 @@ export default function MeusFretesPage() {
                     </Button>
                     <BotaoConcluirFrete frete={f} onConcluido={carregar} />
                   </div>
-                ) : f.status === "cancelado" ? (
-                  <Badge variant="outline" className="border-destructive/40 uppercase text-destructive">
-                    Cancelado
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="uppercase">Finalizado</Badge>
-                )
+                ) : undefined
               }
             />
           ))}
