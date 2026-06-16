@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Pencil, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TelaCarregando } from "@/components/shared/loading";
 import { FreteCard } from "@/features/fretes/components/frete-card";
+import { BotaoCompartilhar } from "@/components/shared/botao-compartilhar";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { buscarFrete, cancelarFrete } from "@/features/fretes/services/frete-service";
@@ -108,6 +109,18 @@ export default function VerFretePage() {
           ) : undefined
         }
       />
+
+      {frete.status === "ativo" && (
+        <div className="surface mt-4 flex flex-col gap-3 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-medium">Divulgue este frete</p>
+            <p className="text-sm text-muted-foreground">
+              Compartilhe em grupos de WhatsApp e ache um motorista mais rápido.
+            </p>
+          </div>
+          <BotaoCompartilhar frete={frete} />
+        </div>
+      )}
     </main>
   );
 }
