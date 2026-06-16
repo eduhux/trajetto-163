@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FreteCard } from "@/features/fretes/components/frete-card";
 import { OnboardingTutorial } from "@/components/shared/onboarding-tutorial";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useUIStore } from "@/stores";
@@ -66,6 +67,10 @@ export default function PainelPage() {
   const media = motorista?.avaliacaoMedia
     ? motorista.avaliacaoMedia.toFixed(1)
     : "—";
+
+  const recentes = (
+    ehMotorista ? (fretes ?? []) : (fretes ?? []).filter((f) => f.status === "ativo")
+  ).slice(0, 4);
 
   const stats = ehMotorista
     ? [
@@ -136,6 +141,38 @@ export default function PainelPage() {
           descricao="Veja as cargas disponíveis no corredor MS ⇄ SP."
         />
       </div>
+
+      {/* Fretes ativos / atividade recente */}
+      {recentes.length > 0 && (
+        <section className="mt-8">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <h2 className="font-display text-lg font-semibold">
+              {ehMotorista ? "Atividade recente" : "Seus fretes ativos"}
+            </h2>
+            <Link
+              href={ehMotorista ? "/realizados" : "/meus-fretes"}
+              className="text-sm text-trajetto underline-offset-4 hover:underline"
+            >
+              Ver todos
+            </Link>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {recentes.map((f) => (
+              <FreteCard
+                key={f.id}
+                frete={f}
+                acao={
+                  ehMotorista ? undefined : (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/meus-fretes/${f.id}`}>Abrir</Link>
+                    </Button>
+                  )
+                }
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Dados da conta */}
       <div className="mt-4 grid max-w-lg gap-3 rounded-2xl surface p-6 text-sm">
