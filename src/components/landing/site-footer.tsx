@@ -60,7 +60,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} Trajetto 163. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} Trajjeto 163. Todos os direitos reservados.</p>
           <p className="font-mono">SP ⇄ MS · todas as cidades · carga pesada</p>
         </div>
       </div>

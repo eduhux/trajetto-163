@@ -8,7 +8,7 @@ export default function PlanosPage() {
     <main className="container max-w-3xl py-10">
       <h1 className="font-display text-3xl font-bold tracking-tight">Seja Premium</h1>
       <p className="mt-1 text-muted-foreground">
-        Publique sem limites e ganhe destaque no corredor MS ⇄ SP.
+        Publique sem limites e ganhe destaque no corredor SP ⇄ MS.
       </p>
       <div className="mt-8">
         <PlanosCheckout />

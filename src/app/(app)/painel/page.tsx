@@ -138,7 +138,7 @@ export default function PainelPage() {
           href="/fretes"
           icone={Search}
           titulo="Buscar fretes"
-          descricao="Veja as cargas disponíveis no corredor MS ⇄ SP."
+          descricao="Veja as cargas disponíveis no corredor SP ⇄ MS."
         />
       </div>
 
