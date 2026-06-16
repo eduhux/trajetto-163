@@ -19,11 +19,11 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const origem = f ? `${f.cidadeOrigem}, ${f.estadoOrigem}` : "São Paulo";
   const destino = f ? `${f.cidadeDestino}, ${f.estadoDestino}` : "Mato Grosso do Sul";
   const carga = f?.descricaoCarga ?? "Fretes de carga pesada entre SP e MS";
-  const valor = f
-    ? f.valorACombinar
+  const valor = !f
+    ? ""
+    : f.valorACombinar
       ? "A combinar"
-      : formatCurrencyBRL(f.valorFrete)
-    : "";
+      : formatCurrencyBRL(f.valorFrete).replace(/\u00a0/g, " ");
 
   return new ImageResponse(
     (
@@ -48,7 +48,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             <span style={{ color: LIME, marginLeft: 10 }}>163</span>
           </div>
           <div style={{ display: "flex", color: LIME, fontSize: 22, letterSpacing: 4 }}>
-            FRETE · SP ⇄ MS
+            FRETE SP-MS
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               fontWeight: 700,
             }}
           >
-            Ver no app →
+            Ver no app
           </div>
         </div>
       </div>
