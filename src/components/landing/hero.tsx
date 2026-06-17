@@ -2,6 +2,7 @@
 
 import { type MouseEvent } from "react";
 import Link from "next/link";
+import { RotatingText } from "@/components/shared/rotating-text";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Package, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,9 +48,10 @@ export function Hero() {
             className="mt-6 text-balance font-display text-[2.6rem] font-bold leading-[1.02] tracking-tight md:text-7xl"
           >
             Carga pesada rodando entre{" "}
-            <span className="animate-gradient bg-gradient-to-r from-trajetto via-[#34d399] to-trajetto bg-clip-text text-transparent">
-              todas as cidades
-            </span>{" "}
+            <RotatingText
+              texts={["todas as cidades", "qualquer rota", "capital ou interior"]}
+              mainClassName="text-trajetto"
+            />{" "}
             de SP e MS.
           </motion.h1>
 
