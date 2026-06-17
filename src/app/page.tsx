@@ -1,4 +1,4 @@
-import { BeamsBackground } from "@/components/ui/beams-background";
+import { FundoHome } from "@/components/landing/fundo-home";
 import { SiteHeader } from "@/components/landing/site-header";
 import { Hero } from "@/components/landing/hero";
 import { ComoFunciona } from "@/components/landing/como-funciona";
@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/landing/site-footer";
 export default function HomePage() {
   return (
     <>
-      <BeamsBackground />
+      <FundoHome />
       <div className="relative z-10">
         <SiteHeader />
         <main>

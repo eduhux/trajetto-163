@@ -92,8 +92,6 @@
       radial-gradient(44% 44% at 94% 22%, rgba(245, 166, 35, 0.08), transparent 70%),
       radial-gradient(50% 40% at 80% 100%, rgba(158, 255, 0, 0.06), transparent 70%),
       linear-gradient(180deg, hsl(156 20% 6%), hsl(156 22% 3.5%));
-    will-change: transform, opacity;
-    animation: aurora-breathe 24s ease-in-out infinite;
   }
   .dark body::after {
     content: "";
