@@ -58,7 +58,22 @@ const CORREDORES: [number, number][] = [
   [0, 19],
   [9, 20],
   [12, 18],
+  [5, 16],
+  [3, 16],
+  [9, 19],
+  [12, 20],
+  [0, 18],
+  [5, 15],
 ];
+
+// Fluxos internos que "irradiam" dos hubs (verde, fluindo + viajante)
+const FLUXOS: [number, number][] = [
+  [0, 1], [0, 3], [0, 5], [0, 6], [0, 11],
+  [13, 14], [13, 21], [13, 28], [14, 15], [15, 18],
+];
+
+// Cidades nomeadas (sem ser hub) que ganham um pulso suave
+const PULSAR = [1, 5, 6, 14, 15, 19];
 
 const REGIAO_MS = "M 70 130 C 150 95 300 85 405 115 L 410 250 C 360 360 300 405 200 410 C 120 412 75 330 70 250 Z";
 const REGIAO_SP = "M 485 150 C 600 115 720 120 770 145 C 845 185 855 320 838 410 C 760 372 650 372 520 335 C 480 300 470 210 485 150 Z";
@@ -106,27 +121,57 @@ export function Corridor() {
           />
         ))}
 
-        {/* Corredores entre estados (ambar, fluindo) */}
-        {CORREDORES.map(([a, b], i) => (
-          <g key={`c${i}`}>
-            <line x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y} stroke="#f5a623" strokeOpacity="0.3" strokeWidth="1.5" />
+        {/* Fluxos internos irradiando dos hubs (verde, fluindo + viajante) */}
+        {FLUXOS.map(([a, b], i) => (
+          <g key={`f${i}`}>
             <line
               x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y}
-              stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 12"
+              stroke="#9eff00" strokeOpacity="0.45" strokeWidth="1.3"
+              strokeLinecap="round" strokeDasharray="1 10"
             >
               {!reduced && (
-                <animate attributeName="stroke-dashoffset" from="0" to="-56" dur="1.3s" repeatCount="indefinite" />
+                <animate attributeName="stroke-dashoffset" from="0" to="-44" dur={`${1.6 + (i % 3) * 0.4}s`} repeatCount="indefinite" />
               )}
             </line>
+            {!reduced && (
+              <circle r="2.2" fill="#9eff00" filter="url(#glow)">
+                <animateMotion dur={`${3.6 + i * 0.4}s`} repeatCount="indefinite" path={`M ${NOS[a].x} ${NOS[a].y} L ${NOS[b].x} ${NOS[b].y}`} />
+              </circle>
+            )}
           </g>
         ))}
 
-        {/* Veiculos circulando nos corredores */}
+        {/* Corredores entre estados (ambar, fluindo nos dois sentidos) */}
+        {CORREDORES.map(([a, b], i) => {
+          const ida = i % 2 === 0;
+          return (
+            <g key={`c${i}`}>
+              <line x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y} stroke="#f5a623" strokeOpacity="0.28" strokeWidth="1.5" />
+              <line
+                x1={NOS[a].x} y1={NOS[a].y} x2={NOS[b].x} y2={NOS[b].y}
+                stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 12"
+              >
+                {!reduced && (
+                  <animate attributeName="stroke-dashoffset" from="0" to={ida ? "-56" : "56"} dur={`${1.1 + (i % 3) * 0.3}s`} repeatCount="indefinite" />
+                )}
+              </line>
+            </g>
+          );
+        })}
+
+        {/* Veiculos circulando nos corredores (ida e, em alguns, volta) */}
         {!reduced &&
           CORREDORES.map(([a, b], i) => (
-            <circle key={`v${i}`} r="3" fill="#9eff00" filter="url(#glow)">
-              <animateMotion dur={`${4.5 + i * 0.7}s`} repeatCount="indefinite" path={`M ${NOS[a].x} ${NOS[a].y} L ${NOS[b].x} ${NOS[b].y}`} />
-            </circle>
+            <g key={`v${i}`}>
+              <circle r="3" fill="#9eff00" filter="url(#glow)">
+                <animateMotion dur={`${4 + i * 0.5}s`} repeatCount="indefinite" path={`M ${NOS[a].x} ${NOS[a].y} L ${NOS[b].x} ${NOS[b].y}`} />
+              </circle>
+              {i % 3 === 0 && (
+                <circle r="2.4" fill="#f5a623" filter="url(#glow)">
+                  <animateMotion dur={`${5 + i * 0.45}s`} begin={`${i * 0.4}s`} repeatCount="indefinite" path={`M ${NOS[b].x} ${NOS[b].y} L ${NOS[a].x} ${NOS[a].y}`} />
+                </circle>
+              )}
+            </g>
           ))}
 
         {/* Nos (cidades) */}
@@ -144,6 +189,12 @@ export function Corridor() {
                   </circle>
                 )}
               </>
+            )}
+            {!reduced && !n.hub && PULSAR.includes(i) && (
+              <circle cx={n.x} cy={n.y} r="5" fill="none" stroke="#9eff00" strokeWidth="1" opacity="0.45">
+                <animate attributeName="r" values="5;13;5" dur="3.2s" begin={`${(i % 5) * 0.45}s`} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.45;0;0.45" dur="3.2s" begin={`${(i % 5) * 0.45}s`} repeatCount="indefinite" />
+              </circle>
             )}
             <circle cx={n.x} cy={n.y} r={n.hub ? 7 : 3.6} fill="#0a0c0a" stroke="#9eff00" strokeWidth={n.hub ? 2.5 : 1.5} />
             <circle cx={n.x} cy={n.y} r={n.hub ? 3 : 1.6} fill="#9eff00" />
