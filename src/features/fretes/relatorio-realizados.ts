@@ -12,44 +12,59 @@ function esc(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function paraMs(v: FreteDoc["dataColeta"]): number {
+  return v instanceof Timestamp ? v.toMillis() : typeof v === "number" ? v : 0;
+}
+
 function dataTexto(v: FreteDoc["dataColeta"]): string {
-  const ms = v instanceof Timestamp ? v.toMillis() : typeof v === "number" ? v : 0;
+  const ms = paraMs(v);
   return ms ? formatDateBR(ms) : "—";
+}
+
+export interface OpcoesRelatorio {
+  papel?: "motorista" | "cliente";
+  /** Nome da contraparte por frete (usado no lado do cliente: freteId -> nome do motorista). */
+  nomesPorFrete?: Record<string, string>;
+  /** Texto do período aplicado, para constar no cabeçalho (ex.: "01/08/2026 a 31/08/2026"). */
+  periodoTexto?: string;
 }
 
 /**
  * Abre um relatório limpo em nova aba e chama a impressão do navegador,
- * onde o usuário pode "Salvar como PDF". Não usa dependência externa.
- *
- * papel = "motorista": inclui a coluna "Cliente" (quem contratou).
- * papel = "cliente": omite a contraparte (o frete não guarda o nome do motorista).
+ * onde o usuário pode "Salvar como PDF". Sem dependência externa.
  */
 export function baixarRelatorioRealizados(
   fretes: FreteDoc[],
   nomePessoa: string,
-  papel: "motorista" | "cliente" = "motorista",
+  opcoes: OpcoesRelatorio = {},
 ) {
+  const { papel = "motorista", nomesPorFrete, periodoTexto } = opcoes;
   const ehMotorista = papel === "motorista";
+
+  // Coluna da contraparte: motorista -> Cliente (sempre); cliente -> Motorista (se houver nomes).
+  const temContraparte = ehMotorista || !!nomesPorFrete;
+  const contraparteHead = ehMotorista ? "Cliente" : "Motorista";
+  const nomeContraparte = (f: FreteDoc) =>
+    ehMotorista ? f.clienteNome : (nomesPorFrete?.[f.id] ?? "—");
+
   const total = fretes.reduce((s, f) => s + (f.valorACombinar ? 0 : f.valorFrete || 0), 0);
   const geradoEm = formatDateBR(Date.now());
   const titulo = ehMotorista
     ? "Relatorio de fretes realizados"
     : "Relatorio de fretes finalizados";
   const pessoaLabel = ehMotorista ? "Motorista" : "Cliente";
-
-  const colClienteHead = ehMotorista ? "<th>Cliente</th>" : "";
-  const colspanTotal = ehMotorista ? 5 : 4;
+  const colspanTotal = temContraparte ? 5 : 4;
 
   const linhas = fretes
     .map((f, i) => {
-      const colCliente = ehMotorista ? `<td>${esc(f.clienteNome)}</td>` : "";
+      const colContraparte = temContraparte ? `<td>${esc(nomeContraparte(f))}</td>` : "";
       return `
       <tr>
         <td>${i + 1}</td>
         <td>${dataTexto(f.dataColeta)}</td>
         <td>${esc(f.cidadeOrigem)}/${esc(f.estadoOrigem)} &rarr; ${esc(f.cidadeDestino)}/${esc(f.estadoDestino)}</td>
         <td>${esc(f.descricaoCarga)}</td>
-        ${colCliente}
+        ${colContraparte}
         <td class="v">${f.valorACombinar ? "A combinar" : formatCurrencyBRL(f.valorFrete)}</td>
       </tr>`;
     })
@@ -88,13 +103,14 @@ export function baixarRelatorioRealizados(
   <div class="meta">
     <div><strong>${pessoaLabel}:</strong> ${esc(nomePessoa)}</div>
     <div><strong>Gerado em:</strong> ${geradoEm}</div>
+    ${periodoTexto ? `<div><strong>Período:</strong> ${esc(periodoTexto)}</div>` : ""}
     <div><strong>Total de fretes:</strong> ${fretes.length}</div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>#</th><th>Data coleta</th><th>Rota</th><th>Carga</th>${colClienteHead}<th class="v">Valor</th>
+        <th>#</th><th>Data coleta</th><th>Rota</th><th>Carga</th>${temContraparte ? `<th>${contraparteHead}</th>` : ""}<th class="v">Valor</th>
       </tr>
     </thead>
     <tbody>${linhas}</tbody>

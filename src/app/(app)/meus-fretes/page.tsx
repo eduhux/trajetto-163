@@ -13,7 +13,8 @@ import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { listarFretesDoUsuario, cancelarFrete } from "@/features/fretes/services/frete-service";
-import { baixarRelatorioRealizados } from "@/features/fretes/relatorio-realizados";
+import { listarConversasDoUsuario } from "@/features/chat/services/chat-service";
+import { RelatorioDialog } from "@/features/fretes/components/relatorio-dialog";
 import { regrasDoPlano } from "@/config/planos";
 import type { FreteDoc } from "@/types";
 
@@ -22,6 +23,33 @@ export default function MeusFretesPage() {
   const router = useRouter();
   const [fretes, setFretes] = useState<FreteDoc[] | null>(null);
   const [cancelando, setCancelando] = useState<string | null>(null);
+  const [relatorio, setRelatorio] = useState(false);
+  const [nomesMotorista, setNomesMotorista] = useState<Record<string, string>>({});
+  const [carregandoRel, setCarregandoRel] = useState(false);
+
+  // Resolve o nome do motorista (via conversa do chat) e abre o diálogo.
+  async function abrirRelatorio() {
+    setCarregandoRel(true);
+    try {
+      const finalizados = (fretes ?? []).filter((f) => f.status === "finalizado");
+      const conversas = await listarConversasDoUsuario(perfil!.uid);
+      const mapa: Record<string, string> = {};
+      finalizados.forEach((f) => {
+        if (!f.motoristaUid) return;
+        const c = conversas.find(
+          (cv) => cv.freteId === f.id && cv.participantes.includes(f.motoristaUid as string),
+        );
+        const nome = c?.metaParticipantes?.[f.motoristaUid]?.nome;
+        if (nome) mapa[f.id] = nome;
+      });
+      setNomesMotorista(mapa);
+    } catch {
+      setNomesMotorista({});
+    } finally {
+      setCarregandoRel(false);
+      setRelatorio(true);
+    }
+  }
 
   async function handleCancelar(id: string) {
     if (!window.confirm("Cancelar este frete? Ele sai do ar para os motoristas.")) return;
@@ -74,15 +102,15 @@ export default function MeusFretesPage() {
               <Button
                 variant="outline"
                 size="md"
-                onClick={() =>
-                  baixarRelatorioRealizados(
-                    (fretes ?? []).filter((f) => f.status === "finalizado"),
-                    perfil.nomeCompleto,
-                    "cliente",
-                  )
-                }
+                onClick={abrirRelatorio}
+                disabled={carregandoRel}
               >
-                <FileDown className="size-4" /> Baixar relatório (PDF)
+                {carregandoRel ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <FileDown className="size-4" />
+                )}
+                Baixar relatório (PDF)
               </Button>
             )}
             <Button asChild variant="primary" size="md">
@@ -168,6 +196,15 @@ export default function MeusFretesPage() {
           ))}
         </div>
       )}
+
+      <RelatorioDialog
+        open={relatorio}
+        onOpenChange={setRelatorio}
+        fretes={(fretes ?? []).filter((f) => f.status === "finalizado")}
+        papel="cliente"
+        nomePessoa={perfil.nomeCompleto}
+        nomesPorFrete={nomesMotorista}
+      />
     </main>
   );
 }

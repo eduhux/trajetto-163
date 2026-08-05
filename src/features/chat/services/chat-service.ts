@@ -234,3 +234,14 @@ export async function buscarConversasDoFrete(
     .map((d) => ({ id: d.id, ...d.data() }) as ConversaDoc)
     .filter((c) => c.freteId === freteId);
 }
+
+/** Busca (uma vez) todas as conversas do usuario — usado para resolver nomes no relatorio. */
+export async function listarConversasDoUsuario(uid: string): Promise<ConversaDoc[]> {
+  const snap = await getDocs(
+    query(
+      collection(db, COLLECTIONS.conversas),
+      where("participantes", "array-contains", uid),
+    ),
+  );
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ConversaDoc);
+}

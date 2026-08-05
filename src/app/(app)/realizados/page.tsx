@@ -12,13 +12,14 @@ import { FreteCard } from "@/features/fretes/components/frete-card";
 import { AvaliarClienteDialog } from "@/features/avaliacoes/components/avaliar-cliente-dialog";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { listarFretesRealizados } from "@/features/fretes/services/frete-service";
-import { baixarRelatorioRealizados } from "@/features/fretes/relatorio-realizados";
+import { RelatorioDialog } from "@/features/fretes/components/relatorio-dialog";
 import type { FreteDoc } from "@/types";
 
 export default function FretesRealizadosPage() {
   const { perfil } = useAuth();
   const [fretes, setFretes] = useState<FreteDoc[] | null>(null);
   const [avaliar, setAvaliar] = useState<FreteDoc | null>(null);
+  const [relatorio, setRelatorio] = useState(false);
 
   useEffect(() => {
     if (!perfil) return;
@@ -45,7 +46,7 @@ export default function FretesRealizadosPage() {
             <Button
               variant="outline"
               size="md"
-              onClick={() => baixarRelatorioRealizados(fretes, perfil.nomeCompleto)}
+              onClick={() => setRelatorio(true)}
             >
               <FileDown className="size-4" /> Baixar relatório (PDF)
             </Button>
@@ -99,6 +100,14 @@ export default function FretesRealizadosPage() {
           onAvaliado={() => marcarAvaliado(avaliar.id)}
         />
       )}
+
+      <RelatorioDialog
+        open={relatorio}
+        onOpenChange={setRelatorio}
+        fretes={fretes ?? []}
+        papel="motorista"
+        nomePessoa={perfil.nomeCompleto}
+      />
     </main>
   );
 }
