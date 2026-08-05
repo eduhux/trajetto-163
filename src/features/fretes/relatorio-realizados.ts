@@ -19,24 +19,40 @@ function dataTexto(v: FreteDoc["dataColeta"]): string {
 
 /**
  * Abre um relatório limpo em nova aba e chama a impressão do navegador,
- * onde o usuário pode "Salvar como PDF". Não usa nenhuma dependência externa.
+ * onde o usuário pode "Salvar como PDF". Não usa dependência externa.
+ *
+ * papel = "motorista": inclui a coluna "Cliente" (quem contratou).
+ * papel = "cliente": omite a contraparte (o frete não guarda o nome do motorista).
  */
-export function baixarRelatorioRealizados(fretes: FreteDoc[], nomeMotorista: string) {
+export function baixarRelatorioRealizados(
+  fretes: FreteDoc[],
+  nomePessoa: string,
+  papel: "motorista" | "cliente" = "motorista",
+) {
+  const ehMotorista = papel === "motorista";
   const total = fretes.reduce((s, f) => s + (f.valorACombinar ? 0 : f.valorFrete || 0), 0);
   const geradoEm = formatDateBR(Date.now());
+  const titulo = ehMotorista
+    ? "Relatorio de fretes realizados"
+    : "Relatorio de fretes finalizados";
+  const pessoaLabel = ehMotorista ? "Motorista" : "Cliente";
+
+  const colClienteHead = ehMotorista ? "<th>Cliente</th>" : "";
+  const colspanTotal = ehMotorista ? 5 : 4;
 
   const linhas = fretes
-    .map(
-      (f, i) => `
+    .map((f, i) => {
+      const colCliente = ehMotorista ? `<td>${esc(f.clienteNome)}</td>` : "";
+      return `
       <tr>
         <td>${i + 1}</td>
         <td>${dataTexto(f.dataColeta)}</td>
         <td>${esc(f.cidadeOrigem)}/${esc(f.estadoOrigem)} &rarr; ${esc(f.cidadeDestino)}/${esc(f.estadoDestino)}</td>
         <td>${esc(f.descricaoCarga)}</td>
-        <td>${esc(f.clienteNome)}</td>
+        ${colCliente}
         <td class="v">${f.valorACombinar ? "A combinar" : formatCurrencyBRL(f.valorFrete)}</td>
-      </tr>`,
-    )
+      </tr>`;
+    })
     .join("");
 
   const html = `<!doctype html>
@@ -44,7 +60,7 @@ export function baixarRelatorioRealizados(fretes: FreteDoc[], nomeMotorista: str
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Relatorio de fretes realizados - Trajjeto 163</title>
+  <title>${titulo} - Trajjeto 163</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: Arial, Helvetica, sans-serif; color: #111; margin: 28px; }
@@ -61,17 +77,16 @@ export function baixarRelatorioRealizados(fretes: FreteDoc[], nomeMotorista: str
     .rod { margin-top: 20px; font-size: 10px; color: #888; text-align: center; }
     @page { margin: 15mm; }
     tr { page-break-inside: avoid; }
-    @media print { .noprint { display: none; } }
   </style>
 </head>
 <body>
   <div class="cab">
     <div class="marca">TRAJJETO <span>163</span></div>
-    <div class="sub">Relatorio de fretes realizados</div>
+    <div class="sub">${titulo}</div>
   </div>
 
   <div class="meta">
-    <div><strong>Motorista:</strong> ${esc(nomeMotorista)}</div>
+    <div><strong>${pessoaLabel}:</strong> ${esc(nomePessoa)}</div>
     <div><strong>Gerado em:</strong> ${geradoEm}</div>
     <div><strong>Total de fretes:</strong> ${fretes.length}</div>
   </div>
@@ -79,13 +94,13 @@ export function baixarRelatorioRealizados(fretes: FreteDoc[], nomeMotorista: str
   <table>
     <thead>
       <tr>
-        <th>#</th><th>Data coleta</th><th>Rota</th><th>Carga</th><th>Cliente</th><th class="v">Valor</th>
+        <th>#</th><th>Data coleta</th><th>Rota</th><th>Carga</th>${colClienteHead}<th class="v">Valor</th>
       </tr>
     </thead>
     <tbody>${linhas}</tbody>
     <tfoot>
       <tr>
-        <td colspan="5" class="v"><strong>Total recebido</strong></td>
+        <td colspan="${colspanTotal}" class="v"><strong>${ehMotorista ? "Total recebido" : "Total pago"}</strong></td>
         <td class="v"><strong>${formatCurrencyBRL(total)}</strong></td>
       </tr>
     </tfoot>

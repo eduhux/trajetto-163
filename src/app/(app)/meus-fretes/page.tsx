@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PlusCircle, Inbox, Pencil, XCircle, Loader2, Crown } from "lucide-react";
+import { PlusCircle, Inbox, Pencil, XCircle, Loader2, Crown, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -13,6 +13,7 @@ import { FreteCard } from "@/features/fretes/components/frete-card";
 import { BotaoConcluirFrete } from "@/features/avaliacoes/components/botao-concluir-frete";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { listarFretesDoUsuario, cancelarFrete } from "@/features/fretes/services/frete-service";
+import { baixarRelatorioRealizados } from "@/features/fretes/relatorio-realizados";
 import { regrasDoPlano } from "@/config/planos";
 import type { FreteDoc } from "@/types";
 
@@ -68,11 +69,28 @@ export default function MeusFretesPage() {
         titulo="Meus fretes"
         descricao="Gerencie suas cargas publicadas: edite, conclua ou cancele."
         acao={
-          <Button asChild variant="primary" size="md">
-            <Link href="/publicar">
-              <PlusCircle className="size-4" /> Novo frete
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {(fretes?.some((f) => f.status === "finalizado") ?? false) && (
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() =>
+                  baixarRelatorioRealizados(
+                    (fretes ?? []).filter((f) => f.status === "finalizado"),
+                    perfil.nomeCompleto,
+                    "cliente",
+                  )
+                }
+              >
+                <FileDown className="size-4" /> Baixar relatório (PDF)
+              </Button>
+            )}
+            <Button asChild variant="primary" size="md">
+              <Link href="/publicar">
+                <PlusCircle className="size-4" /> Novo frete
+              </Link>
+            </Button>
+          </div>
         }
       >
         {limite === Infinity ? (
