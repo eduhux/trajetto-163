@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PackageCheck, Search, CheckCircle2 } from "lucide-react";
+import { PackageCheck, Search, CheckCircle2, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TelaCarregando } from "@/components/shared/loading";
@@ -12,6 +12,7 @@ import { FreteCard } from "@/features/fretes/components/frete-card";
 import { AvaliarClienteDialog } from "@/features/avaliacoes/components/avaliar-cliente-dialog";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { listarFretesRealizados } from "@/features/fretes/services/frete-service";
+import { baixarRelatorioRealizados } from "@/features/fretes/relatorio-realizados";
 import type { FreteDoc } from "@/types";
 
 export default function FretesRealizadosPage() {
@@ -39,6 +40,17 @@ export default function FretesRealizadosPage() {
       <CabecalhoPagina
         titulo="Fretes realizados"
         descricao="Histórico das cargas que você transportou. Avalie os clientes que atendeu."
+        acao={
+          fretes && fretes.length > 0 ? (
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => baixarRelatorioRealizados(fretes, perfil.nomeCompleto)}
+            >
+              <FileDown className="size-4" /> Baixar relatório (PDF)
+            </Button>
+          ) : undefined
+        }
       />
 
       {fretes === null ? (

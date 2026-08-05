@@ -18,6 +18,15 @@ import { regrasDoPlano } from "@/config/planos";
 import type { PublicarFreteInput } from "@/lib/validations";
 import type { FreteDoc, UserDoc } from "@/types";
 
+/**
+ * Converte a data do input (YYYY-MM-DD) em um Timestamp no dia correto.
+ * Usa meio-dia LOCAL para o fuso horário nunca "virar" para o dia anterior/seguinte.
+ */
+function dataColetaTimestamp(iso: string): Timestamp {
+  const [ano, mes, dia] = iso.split("-").map(Number);
+  return Timestamp.fromDate(new Date(ano, (mes ?? 1) - 1, dia ?? 1, 12, 0, 0, 0));
+}
+
 /** Converte um Timestamp/numero do Firestore para milissegundos. */
 function paraMillis(v: unknown): number {
   if (v instanceof Timestamp) return v.toMillis();
@@ -74,7 +83,7 @@ export async function publicarFrete(
       volumeM3: input.volumeM3 ?? null,
       valorACombinar: !!input.valorACombinar,
       valorFrete: input.valorACombinar ? 0 : (input.valorFrete ?? 0),
-      dataColeta: Timestamp.fromDate(new Date(input.dataColeta)),
+      dataColeta: dataColetaTimestamp(input.dataColeta),
       observacoes: input.observacoes ?? null,
       urgencia: input.urgencia,
       status: "ativo",
@@ -147,7 +156,7 @@ export async function atualizarFrete(
     volumeM3: input.volumeM3 ?? null,
     valorACombinar: !!input.valorACombinar,
     valorFrete: input.valorACombinar ? 0 : (input.valorFrete ?? 0),
-    dataColeta: Timestamp.fromDate(new Date(input.dataColeta)),
+    dataColeta: dataColetaTimestamp(input.dataColeta),
     observacoes: input.observacoes ?? null,
     urgencia: input.urgencia,
     atualizadoEm: serverTimestamp(),
